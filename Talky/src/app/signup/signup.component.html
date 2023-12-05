@@ -1,0 +1,71 @@
+<div class="container">
+  <div *ngIf="talky" class="talky">
+  </div>
+  <div *ngIf="magics" class="magic">
+    <p *ngIf="line" class="line"></p>
+    <div class="inmagic">
+      <div class="almost">
+        <h1 style="margin-bottom: 4rem;">{{ imagesWithMessages[currentImageIndex].message }}</h1>
+      </div>
+      <div class="wait">
+        <img [src]="imagesWithMessages[currentImageIndex].path" alt="Image">
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="sign" id="signupcontainer">
+    <p *ngIf="line" class="line"></p>
+    <div class="welcome">
+      <div class="message">
+        <h1>TALKY</h1>
+        <P>Signup to see photos, posts and<br>
+          comments of your friends</P>
+      </div>
+
+      <div class="formcontainer">
+        <form id="signup-form" (ngSubmit)="onSubmit()">
+          <p class="animate__animated animate__wobble" id="response">{{ registerError }}</p>
+
+          <div class="input-container">
+            <input type="email" placeholder="email" [(ngModel)]="email" name="email" data-cy="email"
+            (input)="realtimeValidation()" >
+            <span *ngIf="mail" class="material-symbols-outlined">check_circle</span>
+            <span *ngIf="userNote" class="material-symbols-outlined">cancel</span>
+          </div>
+
+          <div class="input-container">
+            <input type="text" placeholder="username" [(ngModel)]="userName" name="userName"
+             (input)="realtimeValidation()" data-cy="userName">
+            <span *ngIf="user" class="material-symbols-outlined">check_circle</span>
+            <span *ngIf="userNotn" class="material-symbols-outlined">cancel</span>
+          </div>
+
+          <div class="input-container">
+            <input type="password" placeholder="password" [(ngModel)]="password" name="password" data-cy="password"
+            (input)="realtimeValidation()" >
+            <span *ngIf="passwords" class="material-symbols-outlined">check_circle</span>
+            <span *ngIf="userNotp" class="material-symbols-outlined">cancel</span>
+          </div>
+
+          <div class="input-container">
+            <input type="password" placeholder="confirm password" [(ngModel)]="confirm_password" name="confirm_password"
+            data-cy="confirm-password" (input)="realtimeValidation()" >
+            <span *ngIf="confirms" class="material-symbols-outlined">check_circle</span>
+            <span *ngIf="userNotc" class="material-symbols-outlined">cancel</span>
+          </div>
+
+          <p style="text-align: center; color: #C4C4C4;">This is a community, please respect <br> the rights of everyone
+          </p>
+          <button type="submit" data-cy="signup-btn" value="Submit">Sign up</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="login">
+      <p>Already have an account?</p>
+      <a routerLink="/signin">Login</a>
+    </div>
+  </div>
+
+</div>

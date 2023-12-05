@@ -1,0 +1,33 @@
+<div class="container" >
+  <div class="talky">
+
+  </div>
+
+  <div id="signincontainer">
+    <p *ngIf="line" class="line"></p>
+    <div class="welcome">
+      <div class="message">
+        <h1>TALKY</h1>
+        <P>Signin to see photos, posts and<br>
+           comments of your friends</P>
+      </div>
+
+         <div class="formcontainer">
+          <form id="signup-form" (ngSubmit)="onSubmit()">
+            <p id="response">{{ registerError }}</p>
+            <input type="text" placeholder="username" [(ngModel)]="userName" name="userName" data-cy="userName">
+            <input type="password" placeholder="password" [(ngModel)]="password" name="password" data-cy="password">
+            <p style="text-align: center; color: #C4C4C4;">This is a community, please respect <br> the rights of everyone</p>
+            <button type="submit" data-cy="signup-btn" value="Submit">Sign in</button>
+          </form>
+        </div>
+    </div>
+
+    <div class="login">
+      <p>Are you new?</p>
+      <a routerLink="/signup">Signup </a>
+    </div>
+  </div>
+
+</div>
+

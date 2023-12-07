@@ -10,7 +10,7 @@ export const userRegisterValidationSchema = joi.object({
         }
     }),
     password:joi.string().required().pattern(
-        new RegExp ('^[a-zA-Z0-9!@#%$&*()]{0,30}$')
+        new RegExp ('^[a-zA-Z0-9!@#%$&*().]{0,30}$')
     )
 
 });
@@ -19,7 +19,7 @@ export const userRegisterValidationSchema = joi.object({
 export const userLoginValidationSchema = joi.object({
     userName:joi.string().required().min(2).max(30),
     password:joi.string().required().pattern(
-        new RegExp ('^[a-zA-Z0-9!@#%$&*()]{0,30}$')
+        new RegExp ('^[a-zA-Z0-9!@#%$&*().]{0,30}$')
     )
 
 });

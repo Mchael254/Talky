@@ -1,5 +1,5 @@
 ### register user
-post  http://localhost:5800/users/register
+post  http://localhost:5800/user/register
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ### login user
-post  http://localhost:5800/users/login
+post  http://localhost:5800/user/login
 Content-Type: application/json
 
 {
@@ -20,4 +20,17 @@ Content-Type: application/json
 }
 
 ### get get_email_userName
-get  http://localhost:5800/users/get_email_userName
+get  http://localhost:5800/user/get_email_userName
+
+### get all users
+get  http://localhost:5800/user/
+
+### follow user
+post  http://localhost:5800/user/followUser
+Content-Type: application/json
+
+{
+
+    "userID": "34ad6d54-3fc0-4209-9994-f5c0c5ba089e",
+    "userFollowedID": "9738c159-02ea-470d-a63d-6f791041775a"
+}

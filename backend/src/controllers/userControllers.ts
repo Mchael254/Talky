@@ -5,6 +5,7 @@ import mssql from "mssql";
 import { v4 } from "uuid";
 import { userLoginValidationSchema, userRegisterValidationSchema } from "../validators/userValidators";
 import { sqlConfig } from "../config/sqlConfig";
+import { ExtendedUser } from "../middleware/tokenVerify.ts";
 
 //register user
 export const registerUser = async (req: Request, res: Response) => {
@@ -118,6 +119,50 @@ export const get_email_userName = async (req: Request, res: Response) => {
             .execute("get_email_userName");
 
         return res.status(200).json(data.recordset);
+    } catch (error) {
+        return res.json({
+            error: error
+        })
+    }
+}
+
+//checkUser Details
+export const checkUserDetails = async (req: ExtendedUser, res: Response) => {
+    if (req.info) {
+        return res.json({
+            info: req.info
+        })
+    }
+}
+
+//get all users
+export const getAllUsers = async (req: Request, res: Response) => {
+    try {
+        const pool = await mssql.connect(sqlConfig);
+
+        const data = await pool.request()
+            .execute("getUsers");
+
+        return res.status(200).json(data.recordset);
+    } catch (error) {
+        return res.json({
+            error: error
+        })
+    }
+}
+
+//follow user
+export const followUser = async (req:Request,res:Response) => {
+    try {
+        
+        const {userID,userFollowedID } = req.body;
+        const pool = await mssql.connect(sqlConfig);
+        const data = await pool.request()
+            .input("userID", mssql.VarChar, userID)
+            .input("userFollowedID", mssql.VarChar, userFollowedID)
+            .execute("followUser");
+
+        return res.status(200).json({ message: 'User followed successfully.' });
     } catch (error) {
         return res.json({
             error: error

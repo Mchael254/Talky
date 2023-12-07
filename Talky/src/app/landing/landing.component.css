@@ -1,0 +1,177 @@
+.container{
+  display: flex;
+  flex-direction: column;
+  border: solid 2px black;
+  background: linear-gradient(to bottom left,#6004c4, #8004a4,#a80474);
+  width: 98vw;
+  align-items: center;
+  /* background: linear-gradient(to bottom left,#6004c4, #8004a4, #8004a4,#a80474); */
+
+
+}
+
+.welcome{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* height: 90vh; */
+  /* border: solid red 2px; */
+  width: 97vw;
+  background: linear-gradient(to bottom left,#6004c4, #8004a4,#a80474);
+}
+.equalizer{
+  height: 88vh;
+  width: 97vw;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.talkyWord{
+  display: flex;
+  justify-content: center;
+  height: 85vh;
+  width: 40vw;
+  /* border: solid blue 2px; */
+
+}
+.talkyWord h1{
+  font-size: 8rem;
+  font-family: 'Pacifico', cursive;
+  color: #ffffff;
+}
+.talkyPic{
+  height: 65vh;
+  width: 30vw;
+  background: url('../../assets/talky3.jpeg');
+  background-repeat: none;
+  background-size: cover;
+  background-position: center center;
+  transform: rotate(10deg);
+
+}
+.coonect{
+  width: 97vw;
+  display: flex;
+  justify-content: space-around;
+  margin-top:-70px ;
+
+}
+.connect{
+  width: 20vw;
+  height: 20vh;
+  color: #ffffff;
+  text-align: center;
+
+}
+.connect p{
+  font-size: x-small;
+  font-weight: lighter;
+}
+.connect h1{
+  font-size: 3rem;
+}
+.enter{
+  width: 30vw;
+  height: 20vh;
+  display: flex;
+  justify-content: flex-start;
+  text-align: center;
+}
+.enter a{
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 2rem;
+  font-family: 'Pacifico', cursive;
+  margin-left: 1rem;
+  border: solid #ffffff 2px;
+  padding: 1rem;
+  height: 3rem;
+  width: 9rem;
+  border-radius: 40px;
+}
+.message{
+  width: 97vw;
+  height: 20vh;
+  display: flex;
+  align-items: center;
+}
+.theMessage{
+  width: 40vw;
+  height: 15vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  line-height: 3rem;
+}
+.globe{
+  width: 97vw;
+  height: 25vh;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.globeMessage{
+  width: 70vw;
+  font-size: 1rem;
+  font-family: 'Pacifico', cursive;
+  text-transform: uppercase;
+  color: #ffffff;
+  line-height: 3rem;
+}
+.pictures{
+  width: 96vw;
+  height: 70vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border: solid 2px black;
+}
+.profile{
+  width: 20vw;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  border: solid 2px black;
+  background-color: #ffffff;
+}
+.pic{
+  width: 10vw;
+  height: 10vw;
+  border-radius: 50%;
+  background-repeat: none;
+  background-size: cover;
+  background-position: center center;
+  border: solid 2px black;
+}
+.pic img{
+  width: 10vw;
+  height: 10vw;
+  border-radius: 50%;
+}
+.messagePic{
+  width: 15vw;
+  height: 15vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+
+}
+.footer{
+  width: 96vw;
+  height: 30vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border: solid 2px black;
+  background-color: black;
+  margin: 20px 0px;
+  color: #ffffff;
+}
+

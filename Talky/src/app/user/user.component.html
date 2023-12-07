@@ -1,1 +1,170 @@
-<p>user works!</p>
+<div class="container">
+  <div class="navigation">
+    <div class="parts">
+      <h1>TALKY </h1>
+    </div>
+
+    <div class="parts">
+      <button (click)="viewHome()"><span class="material-symbols-outlined">
+          home
+        </span>Home</button>
+    </div>
+    <div class="parts">
+      <button><span class="material-symbols-outlined">
+          search
+        </span>Explore</button>
+    </div>
+    <div class="parts">
+      <button (click)="profileView()"><span class="material-symbols-outlined">
+          account_circle
+        </span>Profile</button>
+    </div>
+    <div class="parts">
+      <button><span class="material-symbols-outlined">
+          logout
+        </span>Logout</button>
+    </div>
+
+    <div class="post">
+      <button>Post</button>
+
+    </div>
+
+  </div>
+  <div class="functions">
+    <div *ngIf="profile" class="profileManage">
+      <div *ngIf="mine" class="profileBar">
+        <div class="profilePhoto">
+          <img src="{{image}}" alt="">
+        </div>
+        <div class="userDetails">
+          <h1>Venum</h1>
+          <div class="numbers">
+            <div class="follow">
+              <p>Followers</p>
+              <p>Following</p>
+            </div>
+            <button>Edit Profile</button>
+          </div>
+
+        </div>
+      </div>
+      <div *ngIf="specificUser" class="profileBar">
+        
+        <div class="profilePhoto">
+          <img src="{{image}}" alt="">
+        </div>
+        <div class="userDetails">
+          <h1>{{otherName}}</h1>
+          <p style="display: none;">{{otherID}}</p>
+          <div class="numbers">
+            <div class="follow">
+              <p><span style="font-weight: bold;">Followers </span>{{otherFollowers}}</p>
+              <p><span style="font-weight: bold;">Following </span>{{otherFollowing}}</p>
+            </div>
+            <button (click)="followUser(otherID)">Follow</button>
+            <button>Unfollow</button>
+          </div>
+
+        </div>
+      </div>
+      <div class="content">
+        <div class="bar">
+
+          <div class="barParts">
+            <div class="line" *ngIf="linep"></div>
+            <button (click)="posts()">Posts</button>
+          </div>
+          <div class="barParts">
+            <div class="line" *ngIf="linem"></div>
+            <button (click)="media()">Media</button>
+          </div>
+          <div class="barParts">
+            <div class="line" *ngIf="linef"></div>
+            <button (click)="followers()">Followers</button>
+          </div>
+          <div class="barParts">
+            <div class="line" *ngIf="linel"></div>
+            <button (click)="following()">Following </button>
+          </div>
+        </div>
+
+        <div *ngIf="general" class="general">
+          <div *ngIf="folowers" class="follower">
+            <img src="{{image}}" alt="">
+            <p style="font-weight: bold;">userName </p>
+            <button>Follow</button>
+            <button>View</button>
+          </div>
+
+          <div *ngIf="folowing" class="follower">
+            <img src="{{image}}" alt="">
+            <p style="font-weight: bold;">useName </p>
+            <button>Follow</button>
+            <button>View</button>
+          </div>
+        </div>
+
+        <div *ngIf="post" class="posts">
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+
+        </div>
+
+        <div *ngIf="medias" class="posts">
+          <div class="postCard">
+            <img src="{{image}}" alt="">
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div *ngIf="feeds" class="feeds">
+      <p>feed</p>
+
+    </div>
+
+  </div>
+  <div class="others">
+    <div class="search">
+      <div class="Search">
+        <span class="material-symbols-outlined">
+          search
+        </span>
+        <input type="text" placeholder="Search" [(ngModel)]="searchTearm" (input)="filterUsers()">
+        <div *ngIf="filteredUsers.length === 0" class="no-results-message">Not found</div>
+        </div>
+
+      </div>
+      <p *ngIf="line" class="line"></p>
+      <div *ngIf="filteredUsers" class="suggested">
+        
+        <div *ngFor="let user of filteredUsers" class="suggestions">
+          <img src="{{image}}" alt="">
+          <p style="font-weight: bold;">{{user.userName}}</p>
+          <p style="display: none;">{{user.userID}}</p>
+          <button (click)="viewSpecificUser(user)">View</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>

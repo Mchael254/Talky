@@ -99,7 +99,7 @@ export class AuthService {
 
       if (data.info.role === 'customer') {
         localStorage.setItem('user_email', data.info.email);
-        this.router.navigate(['/landing']);
+        this.router.navigate(['/user']);
 
 
       } else if (data.info.role === 'admin') {

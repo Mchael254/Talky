@@ -14,29 +14,19 @@ export class SignupComponent {
   //get email_userName
   email_userName: any[] = [];
 
-  fetch_email_userName() {
-    this.authservice.fetch_email_userName().subscribe((data: any) => {
-      console.log(data);
-
-      this.email_userName = data;
-      console.log(this.email_userName);
-    });
-  }
-
   ngOnInit() {
     this.showImagesWithDelay();
-    this.fetch_email_userName
+    this.fetch_email_userName();
   }
   showImagesWithDelay() {
     setInterval(() => {
       this.currentImageIndex = (this.currentImageIndex + 1) % this.imagesWithMessages.length;
-    }, 5000); // Change 5000 to the desired delay in milliseconds (e.g., 5000 for 5 seconds)
+    }, 6000);
   }
 
 
   currentImageIndex: number = 0;
   imagesWithMessages: { path: string, message: string }[] = [
-    { path:'../../assets/talky3.jpeg',  message:'welcome to talky' },
     { path: '../../assets/comment.jpg', message: 'Make comments' },
     { path: '../../assets/comments.jfif', message: 'Meet new friends' },
     { path: '../../assets/memories.jfif', message: 'Share your moments' },
@@ -45,7 +35,7 @@ export class SignupComponent {
 
   //magic
   sign: boolean = true;
-  magics:boolean = false;
+  magics: boolean = false;
   talky: boolean = false;
   line: boolean = false;
 
@@ -56,32 +46,45 @@ export class SignupComponent {
   password: string = '';
   confirm_password: string = '';
   registerError: string = '';
-  mail:boolean = false;
-  user:boolean = false;
-  userNotp:boolean = false;
-  userNotn:boolean = false;
-  userNote:boolean = false;
-  userNotc:boolean = false;
-  passwords:boolean = false;
-  confirms:boolean = false;
+  mail: boolean = false;
+  user: boolean = false;
+  userNotp: boolean = false;
+  userNotn: boolean = false;
+  userNote: boolean = false;
+  userNotc: boolean = true;
+  passwords: boolean = false;
+  confirms: boolean = false;
+  emailFormat: boolean = false;
+
+  fetch_email_userName() {
+    this.authservice.fetch_email_userName().subscribe((data: any) => {
+      this.email_userName = data;
+      console.log(this.email_userName);
+    });
+  }
 
   //realtime validation
   realtimeValidation() {
+    const emailExists = this.email_userName.some((user: any) => user.email === this.email);
+    const isEmailValid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email);
+    this.mail = !emailExists && this.email !== '' && isEmailValid;
+    this.userNote = emailExists || this.email === '' || !isEmailValid;
 
-    this.passwords = this.password.length > 8;
-    this.userNotp = this.password.length < 8;
+    const isPasswordValid = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(this.password);
+    const usernameExists = this.email_userName.some((user: any) =>
+      user.userName.trim().toLowerCase() === this.userName.trim().toLowerCase()
+    );
+
+    this.userNotn = usernameExists || this.userName === '' || this.userName.length < 3;
+    this.user = !usernameExists && this.userName !== '' && this.userName.length >= 3;
+
+    this.passwords = this.password.length > 8 && isPasswordValid && this.password !== '';
+    this.userNotp = this.password.length < 8 || !isPasswordValid || this.password === '';
 
     this.confirms = this.password === this.confirm_password;
     this.userNotc = this.password !== this.confirm_password;
-  }
-
-
-  gotoLogin() {
-    this.router.navigate(['/signin']);
-    this.realtimeValidation();
 
   }
-
 
   onSubmit() {
     this.line = true;
@@ -127,11 +130,11 @@ export class SignupComponent {
 
       this.authservice.registerUser(requestData).subscribe(
         (data: any) => {
-          setTimeout(() => {
+          // setTimeout(() => {
 
-          }, 3000);
+          // }, 3000);
           this.line = false;
-          this.gotoLogin();
+          this.knowUser();
         },
         (error) => {
           console.error('Registration failed. Server returned:', error);
@@ -156,7 +159,21 @@ export class SignupComponent {
     }, delay);
   }
 
+  gotoLogin() {
+    this.router.navigate(['/signin']);
+    this.realtimeValidation();
 
+  }
+  knowUser() {
+    this.sign = false;
+    this.talky = false;
+    this.magics = true;
+    setTimeout(() => {
+      this.magics = false;
+      this.gotoLogin();
+    }, 25000);
+
+  }
 
 
 

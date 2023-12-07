@@ -7,12 +7,14 @@ import { SigninComponent } from './signin/signin.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { UserComponent } from './user/user.component';
 
 const routes: Routes = [
   {path:'',redirectTo:'/landing',pathMatch:'full'},
   { path:'landing',component: LandingComponent},
   {path:'signin',component:SigninComponent},
   {path:'signup',component:SignupComponent},
+  {path:'user',component:UserComponent},
   {path:'passwordReset',component:PasswordResetComponent},
   {path:'admin',component:AdminComponent},
   {path:'welcome',component:WelcomeComponent},

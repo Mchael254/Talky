@@ -9,110 +9,48 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./signin.component.css']
 })
 export class SigninComponent {
-  ImagePath!: string;
-  imagePaths: string[] = [
-    '/assets/tembea.jpg'
-
-  ];
-
-  ngOnInit() {
-    this.selectRandomImage();
-
-  }
-
-  selectRandomImage() {
-
-    const randomIndex = Math.floor(Math.random() * this.imagePaths.length);
-    this.ImagePath = this.imagePaths[randomIndex];
-  }
-
-  //form validation
   userName: string = '';
-  email: string = '';
-  phone_no: string = '';
   password: string = '';
-  confirm_password: string = '';
-  registerError: string = '';
-  line: boolean = false;
+  loginError: string = '';
+  loginSuccess:string = '';
+  line:boolean = false;
 
-  constructor(private http: HttpClient, private router: Router, private authservice: AuthService,) { }
 
-  onSubmit() {
-    //form validation
+  constructor( private http: HttpClient,private router: Router, private userAuth: AuthService) { }
+
+  async onSubmit() {
     this.line = true;
-    setTimeout(() => {
+    setTimeout(async () => {
       this.line = false;
-      if (
-        this.userName === '' ||
-        this.email === '' ||
-        this.phone_no === '' ||
-        this.password === '' ||
-        this.confirm_password === ''
-      ) {
+    //credentials validation
+    if (!this.userName || !this.password) {
+      this.loginError = 'Fill in all fields';
+      this.clearRegisterError(4000);
+      return;
 
-        this.registerError = 'Please fill all fields';
-        setTimeout(() => {
-          this.registerError = '';
-        }, 3000);
-        return;
-      }
+    }
+    const requestData = {
+      userName: this.userName,
+      password: this.password
+    };
+    this.loginError = '';
 
-      if (this.password.length < 8) {
-        this.registerError = 'Password must be at least 8 characters';
-        setTimeout(() => {
-          this.registerError = '';
-        }, 3000);
-        return;
-      }
+   await this.userAuth.login(requestData, () => {
+      this.userAuth.redirect();
 
-      if (this.password !== this.confirm_password) {
-        this.registerError = 'Passwords do not match';
-        setTimeout(() => {
-          this.registerError = '';
-        }, 3000);
-        return;
-      }
+    });
+    this.loginError = this.userAuth.getLoginError();
+    this.loginSuccess = this.userAuth.getLoginSuccess();
 
-      const requestData = {
-        userName: this.userName,
-        email: this.email,
-        phone_no: this.phone_no,
-        password: this.password
-      };
+    this.clearRegisterError(4000);
+  }, 3000);
 
-
-      this.authservice.registerUser(requestData).subscribe(
-        (data: any) => {
-          console.log(data);
-          this.gotoLogin();
-        },
-        (error) => {
-          console.error('Registration failed. Server returned:', error);
-          const errorResponse = error.error
-          if (errorResponse && errorResponse.message) {
-            this.registerError = errorResponse.message;
-          } else if (errorResponse && errorResponse.error) {
-            this.registerError = errorResponse.error;
-          } else {
-            this.registerError = 'Network error. We will back soon';
-          }
-          this.clearRegisterError(5000);
-        }
-      );
-    }, 3000);
   }
-
 
   clearRegisterError(delay: number) {
     setTimeout(() => {
-      this.registerError = '';
+      this.loginError = '';
     }, delay);
   }
-
-
-  gotoLogin() {
-    this.router.navigate(['/signin']);
-  }
-
 
 }

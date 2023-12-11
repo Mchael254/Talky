@@ -1,76 +1,144 @@
 <div class="container">
   <div class="navigation">
     <div class="parts">
-      <h1>TALKY </h1>
+      <img src="../../assets/talk.png" alt="" style="height: 20vh;border-radius: 50%;">
     </div>
 
     <div class="parts">
-      <button (click)="viewHome()"><span class="material-symbols-outlined">
+      <button (click)="viewHome()"><span style="border: solid 0px;" class="material-symbols-outlined">
           home
         </span>Home</button>
     </div>
     <div class="parts">
-      <button><span class="material-symbols-outlined">
+      <button><span style="border: solid 0px;" class="material-symbols-outlined">
           search
         </span>Explore</button>
     </div>
+
     <div class="parts">
-      <button (click)="profileView()"><span class="material-symbols-outlined">
-          account_circle
-        </span>Profile</button>
+      <button (click)="exit()"><span style="border: solid 0px;" class="material-symbols-outlined">
+          exit_to_app
+        </span>Exit</button>
     </div>
+
     <div class="parts">
-      <button><span class="material-symbols-outlined">
-          logout
-        </span>Logout</button>
+      <button (clickOutside)="onClickedOutside($event)" (click)="mores()"><span style="border: solid 0px;"
+          class="material-symbols-outlined">
+          expand_circle_up
+        </span>More</button>
     </div>
+    <!-- <div *ngIf="moreModal" class="moreModal"></div> -->
+    <div *ngIf="moret" class="more">
+      <div class="parts">
+        <button (click)="logout()"><span style="border: solid 0px;" class="material-symbols-outlined">
+            logout
+          </span>Logout</button>
+      </div>
+      <div class="parts">
+        <button (click)="profileView()"><span style="border: solid 0px;" class="material-symbols-outlined">
+            account_circle
+          </span>Profile</button>
+      </div>
+    </div>
+
 
     <div class="post">
-      <button>Post</button>
-
+      <button (click)="POST()">Post</button>
     </div>
-
+    <div *ngIf="modal" class="modal"></div>
+    <div *ngIf="postss" class="postsD">
+      <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent successfully</p>
+      <button (click)="cancel()" id="cancel">X</button>
+      <div class="postContent">
+        <img src="{{image}}" alt="">
+        <textarea type="text" [(ngModel)]="textPost" placeholder="Whats on your mind .."></textarea>
+      </div>
+      <div class="postMedia">
+        <div class="galleryPost">
+          <div class="phot">
+            <label class="material-symbols-outlined" for="fileInput">
+              add_photo_alternate
+            </label>
+            <input type="file" id="fileInput" (change)="previewImage($event)">
+          </div>
+        </div>
+        <img class="" *ngIf="imagePreview" [src]="imagePreview" alt="Image Preview" id="imagePreview"
+          (click)="closePreview()">
+        <button>POST</button>
+      </div>
+    </div>
   </div>
+
+
+  <!-- profiles and feeds -->
   <div class="functions">
+    <!-- user and other's profiles -->
+    <!-- userProfile -->
     <div *ngIf="profile" class="profileManage">
       <div *ngIf="mine" class="profileBar">
-        <div class="profilePhoto">
-          <img src="{{image}}" alt="">
+        <div class="profilePhoto" (click)="openProfile()">
+          <img *ngIf="matchingUser && matchingUser.profilePic" [src]="getImageDataUrl(matchingUser)"
+            alt="Profile Picture">
         </div>
+        <div *ngIf="changeModal" class="changeModal">
+          <button>Remove</button>
+          <button (click)="openFileInput()">Update</button>
+          <button (click)="closePic()">Cancel</button>
+
+        </div>
+        <div class="galleryPos" style="height: 15px;">
+          <div class="phot">
+            <input type="file" id="fileInput" (change)="previewImage($event)">
+          </div>
+        </div>
+        <div *ngIf="modalProfileUpdate" class="modalProfileUpdate">
+          <div class="butts">
+            <button (click)="closePic2()" style="padding: 15px;border-radius: 5px;cursor: pointer;font-size: medium;
+            ">Close</button>
+          </div>
+          <div class="picUpdate" style="position: relative;">
+            <img *ngIf="imagePreview" [src]="imagePreview" alt="Image Preview" id="imagePreview2">
+            <button style="position: absolute;bottom: 7px;right: 5px;border-radius: 50%;
+            background-color: #0094f5;height: 7vh;width: 3vw;display: flex;justify-content: baseline;align-items: center;
+            cursor: pointer;font-size: 14px;color: #fff;">Update</button>
+          </div>
+        </div>
+
         <div class="userDetails">
-          <h1>Venum</h1>
+          <h1>{{profileName}}</h1>
           <div class="numbers">
             <div class="follow">
-              <p>Followers</p>
-              <p>Following</p>
+              <p>Followers 1200</p>
+              <p>Following 1.5k</p>
             </div>
-            <button>Edit Profile</button>
+            <button *ngIf="edits" (click)="edit()">Edit Profile</button>
           </div>
 
         </div>
       </div>
+
+      <!-- otherUser profile -->
       <div *ngIf="specificUser" class="profileBar">
-        
         <div class="profilePhoto">
-          <img src="{{image}}" alt="">
+          <img *ngIf="otherUser.profilePic" [src]="getImageDataUrl(otherUser)" alt="Profile Picture">
         </div>
         <div class="userDetails">
           <h1>{{otherName}}</h1>
           <p style="display: none;">{{otherID}}</p>
           <div class="numbers">
             <div class="follow">
-              <p><span style="font-weight: bold;">Followers </span>{{otherFollowers}}</p>
-              <p><span style="font-weight: bold;">Following </span>{{otherFollowing}}</p>
+              <p><span style="font-weight: bold;">Followers 20 </span>{{otherFollowers}}</p>
+              <p><span style="font-weight: bold;">Following 1200</span>{{otherFollowing}}</p>
             </div>
-            <button (click)="followUser(otherID)">Follow</button>
-            <button>Unfollow</button>
+            <button *ngIf="folUser" (click)="followUser(otherID)" [class.active]="isFollow">Follow</button>
+            <button *ngIf="unfolUser" (click)="unfollowUser()" [class.active]="isUnfollow">Unfollow</button>
           </div>
-
         </div>
       </div>
+
+      <!-- profile contents -->
       <div class="content">
         <div class="bar">
-
           <div class="barParts">
             <div class="line" *ngIf="linep"></div>
             <button (click)="posts()">Posts</button>
@@ -105,7 +173,7 @@
           </div>
         </div>
 
-        <div *ngIf="post" class="posts">
+        <div *ngIf="post" class="postsC">
           <div class="postCard">
             <p>Post</p>
             <img src="{{image}}" alt="">
@@ -122,44 +190,192 @@
             <p>Post</p>
             <img src="{{image}}" alt="">
           </div>
-
         </div>
 
-        <div *ngIf="medias" class="posts">
+        <div *ngIf="medias" class="postsC">
           <div class="postCard">
             <img src="{{image}}" alt="">
-
           </div>
-
         </div>
-
       </div>
-
     </div>
 
     <div *ngIf="feeds" class="feeds">
-      <p>feed</p>
+      <div class="foll">
+        <button  (click)="seeMore()" class="seeMore">Options</button>
+        <button (click)="yourFollower()">Following</button>
+        <button (click)="yourFollowin()">For you </button>
+      </div>
+      <div *ngFor="let user of filteredUsers" class="feed">
+        <div class="speak">
+          <div class="speakImage">
+            <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture">
+          </div>
+          <div class="speakMessage">
+            <div class="speakDetails">
+              <h3>{{user.userName}} <span style="font-size: 20px;color: #575555;">2h</span></h3>
+            </div>
+            <p style="color: rgb(82, 77, 77);">{{postq}}</p>
+            <img src="{{image}}" alt="">
+          </div>
+
+        </div>
+        <div class="impress">
+          <button (click)="toggleFavorite()" [class.active]="isFavorite">
+            <span class="material-symbols-outlined" [class.active]="isFavorite"
+              style="border: solid 0px;font-weight: lighter;">favorite</span>
+            <span class="fav" style="font-size: medium;" [class.active]="isFavorite">{{ favoriteCount }}</span>
+          </button>
+          <button (click)="comment()"> <span class="material-symbols-outlined"
+              style="border: solid 0px;font-weight: lighter;">
+              comment
+            </span></button>
+
+          <div *ngIf="modal" class="modal"></div>
+          <div *ngIf="postss1" class="postsD" style="height: 60vh;width:40vw;padding: 20px;border-radius: 15px;">
+            <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent successfully
+            </p>
+            <button (click)="cancel()" id="cancel">X</button>
+            <div class="postContent" style="height: auto;min-height: 3vh;">
+              <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;">
+              <p style="font-weight: bold;">{{userName}}</p>
+            </div>
+            <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
+              <p>{{postq}}</p>
+            </div>
+
+            <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
+              <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;">
+              <textarea type="text" [(ngModel)]="textPost2" placeholder="Post your reply  .."
+                style="min-height: 6vh;border: solid blue 2px;"></textarea>
+            </div>
+            <div class="postMedia" style="text-align: center;height: 7vh;width: 40vw;">
+              <button style="background-color: #0094f5;color: #fff;text-align: center;width: 10vw;display: flex;align-items: center;
+              justify-content: center;margin-left: 35vw;margin-top: 25px;">REPLY</button>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+
+    </div>
+    <div *ngIf="feeds1" class="feeds">
+      <div class="foll">
+        <button>Following</button>
+        <button>For you </button>
+      </div>
+      <div *ngFor="let user of filteredUsers" class="feed">
+        <div class="speak">
+          <div class="speakImage">
+            <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture">
+          </div>
+          <div class="speakMessage">
+            <div class="speakDetails">
+              <p>{{user.userName}} <span style="font-size: 20px;color: #575555;">2h</span></p>
+            </div>
+            <p style="color: rgb(82, 77, 77);">{{postq}}</p>
+            <img src="{{image1}}" alt="">
+          </div>
+
+        </div>
+        <div class="impress">
+          <button (click)="toggleFavorite()" [class.active]="isFavorite">
+            <span class="material-symbols-outlined" [class.active]="isFavorite"
+              style="border: solid 0px;font-weight: lighter;">favorite</span>
+            <span class="fav" style="font-size: medium;" [class.active]="isFavorite">{{ favoriteCount }}</span>
+          </button>
+          <button (click)="comment()"> <span class="material-symbols-outlined"
+              style="border: solid 0px;font-weight: lighter;">
+              comment
+            </span></button>
+
+          <div *ngIf="modal" class="modal"></div>
+          <div *ngIf="postss1" class="postsD" style="height: 60vh;width:40vw;padding: 20px;border-radius: 15px;">
+            <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent successfully
+            </p>
+            <button (click)="cancel()" id="cancel">X</button>
+            <div class="postContent" style="height: auto;min-height: 3vh;">
+              <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;">
+              <p style="font-weight: bold;">{{userName}}</p>
+            </div>
+            <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
+              <p>{{postq}}</p>
+            </div>
+
+            <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
+              <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;">
+              <textarea type="text" [(ngModel)]="textPost2" placeholder="Post your reply  .."
+                style="min-height: 6vh;border: solid blue 2px;"></textarea>
+            </div>
+            <div class="postMedia" style="text-align: center;height: 7vh;width: 40vw;">
+              <button style="background-color: #0094f5;color: #fff;text-align: center;width: 10vw;display: flex;align-items: center;
+              justify-content: center;margin-left: 35vw;margin-top: 25px;">REPLY</button>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
 
     </div>
 
+
+
   </div>
   <div class="others">
-    <div class="search">
-      <div class="Search">
-        <span class="material-symbols-outlined">
-          search
-        </span>
-        <input type="text" placeholder="Search" [(ngModel)]="searchTearm" (input)="filterUsers()">
-        <div *ngIf="filteredUsers.length === 0" class="no-results-message">Not found</div>
+    <div *ngIf="profil" class="profil">
+      <button (click)="cancell()" id="cancell">X</button>
+      <div class="formcontainer">
+        <div class="errors"
+          style="border: solid gray 0px; height: 50px;width: 20vw;display: flex;align-items: center;justify-content: center;">
+          <p *ngIf="err" style="background-color: rgb(206, 68, 68);padding: 10px;width: 15vw;text-align: center;">
+            {{updateError}}</p>
+          <p *ngIf="success" style="background-color:#0094f5;padding:10px;width: 15vw;text-align: center;">
+            {{updateSuccess}}</p>
+        </div>
+        <form id="signup-form" (ngSubmit)="onSubmit()">
+          <div class="input-container">
+            <input readonly type="email" placeholder="email" [(ngModel)]="email" name="email" data-cy="email">
+          </div>
+
+          <div class="input-container">
+            <input type="text" placeholder="username" [(ngModel)]="userName" name="userName" data-cy="userName">
+          </div>
+
+          <div class="input-container">
+            <input type="password" placeholder="password" [(ngModel)]="password" name="passwords" data-cy="password">
+          </div>
+
+          <div class="input-container">
+            <input type="password" placeholder="confirm password" [(ngModel)]="confirm_password" name="confirm_password"
+              data-cy="confirm-password">
+          </div>
+          <button type="submit" data-cy="signup-btn" value="Submit">Change Profile</button>
+        </form>
+
+      </div>
+    </div>
+
+    <div *ngIf="others" class="man">
+      <div class="search">
+        <div class="Search">
+          <span class="material-symbols-outlined" style="border: solid 0px;">
+            search
+          </span>
+          <input type="text" placeholder="Search" [(ngModel)]="searchTearm" (input)="filterUsers()">
+          <div *ngIf="filteredUsers.length === 0" class="no-results-message">Not found</div>
         </div>
 
       </div>
       <p *ngIf="line" class="line"></p>
       <div *ngIf="filteredUsers" class="suggested">
-        
         <div *ngFor="let user of filteredUsers" class="suggestions">
-          <img src="{{image}}" alt="">
+          <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture">
           <p style="font-weight: bold;">{{user.userName}}</p>
+
           <p style="display: none;">{{user.userID}}</p>
           <button (click)="viewSpecificUser(user)">View</button>
         </div>
@@ -167,4 +383,8 @@
 
     </div>
 
+
   </div>
+
+
+</div>

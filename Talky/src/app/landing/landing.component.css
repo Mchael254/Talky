@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   border: solid 2px black;
-  background: linear-gradient(to bottom left,#6004c4, #8004a4,#a80474);
+  background: linear-gradient(#0071a2,#04b3cb);
   width: 98vw;
   align-items: center;
   /* background: linear-gradient(to bottom left,#6004c4, #8004a4, #8004a4,#a80474); */
@@ -18,7 +18,7 @@
   /* height: 90vh; */
   /* border: solid red 2px; */
   width: 97vw;
-  background: linear-gradient(to bottom left,#6004c4, #8004a4,#a80474);
+  background: linear-gradient(to bottom left,#071a32,#0071a2,#04b3cb);
 }
 .equalizer{
   height: 88vh;
@@ -128,17 +128,26 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border: solid 2px black;
+  border: solid 2px #fff;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .profile{
   width: 20vw;
   height: 60vh;
-  display: flex;
+  display:flex;
+  margin-right: 20px;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  border: solid 2px black;
+  /* border: solid 2px black; */
   background-color: #ffffff;
+  transition: transform 1s, opacity 1s;
+}
+.slide-out {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
 }
 .pic{
   width: 10vw;
@@ -174,4 +183,107 @@
   margin: 20px 0px;
   color: #ffffff;
 }
+
+/* media queries */
+@media screen and (max-width: 1024px) {
+
+}
+
+@media screen and (max-width:720px) {
+  .container{
+    border: solid green 2px;
+    width: 100%;
+  }
+  .welcome {
+    border: solid red 2px;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+  }
+  .equalizer{
+    display: flex;
+    flex-direction: column;
+    height: 50vh;
+
+  }
+  .talkyWord{
+    height: auto;
+  }
+  .talkyWord h1{
+    font-size: 4rem;
+  }
+  .talkyPic{
+    height: 30vh;
+    width: 50vw;
+  }
+  .coonect{
+    width: 80%;
+    height: 20vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 25px;
+  }
+  .enter{
+    display: flex;
+    justify-content: center;
+  }
+  .enter a{
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    height: 2rem;
+    width: 7rem;
+    margin-top: 5px;
+  }
+  .message{
+    display: flex;
+    justify-content: center;
+    height: 10vh;
+    margin-top: 65px;
+    width: 80%;
+  }
+  .message h1{
+    font-size: 0.6rem;
+    line-height: 15px;
+
+  }
+  .pictures{
+    height: 20vh;
+    width: 80%;
+
+  }
+  .profile{
+    height: 80%;
+    margin: 25px 0px;
+    word-break: normal;
+  }
+  .messagePic h1{
+    font-size: 0.6rem;
+    line-height: 15px;
+    word-break: normal;
+
+
+  }
+
+
+  .globe{
+    display: none;
+  }
+
+  .footer{
+   display: flex;
+   width: 80%;
+   height: 10vh;
+  }
+  .footer h1{
+    font-size: 0.7rem;
+    line-height: 15px;
+  }
+
+}
+
+
+
 

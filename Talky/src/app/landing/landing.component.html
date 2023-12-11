@@ -35,20 +35,20 @@
       </div>
 
     </div>
-    <div class="pictures">
-      <div class="profile">
-        <div class="pic">
-          <img [src]="photo">
+    <!-- multiple testimony dynamicallly -->
 
+    <div class="pictures" >
+      <div *ngFor="let item of items; let i = index" class="profile" [ngClass]="{ 'slide-out': i === currentIndex }">
+        <div class="pic">
+          <img [src]="item.photo">
         </div>
         <div class="messagePic">
-          <h1>{{message}}</h1>
-
+          <h1>{{ item.message }}</h1>
         </div>
-
       </div>
-
     </div>
+
+
     <div class="footer">
       <div class="business">
         <h1>Business</h1>

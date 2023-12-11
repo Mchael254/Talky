@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 export class UserService {
 
   private apiUrl = 'http://localhost:5800/user';
+  private photoUrl = 'http://localhost:5800/user/uploadProfilePic';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -21,5 +22,20 @@ export class UserService {
   followUser(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/followUser`, data);
   }
+
+   //update profile
+   updateProfile(profileDataUpdate: any): Observable<any> {
+    const updateProfileUrl = `${this.apiUrl}/updateProfile`;
+
+    return this.http.put(updateProfileUrl, profileDataUpdate);
+  }
+  uploadProfilePic(formData: FormData, options?: any): Observable<any> {
+    return this.http.post(this.photoUrl, formData, options);
+  }
+
+
+
+
+
 
 }

@@ -13,6 +13,7 @@ import { PasswordResetComponent } from './password-reset/password-reset.componen
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ClickOutsideModule } from 'ng-click-outside';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ClickOutsideModule
   ],
   providers: [],
   bootstrap: [AppComponent]

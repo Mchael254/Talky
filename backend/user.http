@@ -15,8 +15,8 @@ Content-Type: application/json
 
 {
 
-    "userName": "test",
-    "password": "123456"
+    "userName": "mike",
+    "password": "Mike123.100#"
 }
 
 ### get get_email_userName
@@ -34,3 +34,29 @@ Content-Type: application/json
     "userID": "34ad6d54-3fc0-4209-9994-f5c0c5ba089e",
     "userFollowedID": "9738c159-02ea-470d-a63d-6f791041775a"
 }
+
+### update user profile
+put  http://localhost:5800/user/updateProfile
+Content-Type: application/json
+
+{
+
+    "userName": "Cylvonne",
+    "email": "cylvonnen@gmail.com",
+    "password": "Mike123.1000#"
+
+}
+
+### uplaod user profile image
+post  http://localhost:5800/user/uploadProfilePic
+Content-Type: multipart/form-data
+
+{
+
+    "profilePic": "../backend/public/uploads/talky3.jpeg",
+    "userID": "9738c159-02ea-470d-a63d-6f791041775a"
+
+}
+
+### get student details
+get  http://localhost:5800/user/student

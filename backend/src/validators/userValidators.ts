@@ -35,11 +35,9 @@ export const profileUpdateValidationSchema = joi.object({
         }
     }),
     password:joi.string().required().pattern(
-        new RegExp ('^[a-zA-Z0-9!@#%$&*()]{0,30}$')
+        new RegExp ('^[a-zA-Z0-9!@#%$&*().]{0,30}$')
     ),
-    userName:joi.string().required().min(2).max(30),
-    phone_no:joi.string().required().min(10).max(10),
-    
+    userName:joi.string().required().min(2).max(30),  
 
 });
 

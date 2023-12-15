@@ -6,7 +6,7 @@ const follow_router = Router()
 //follow,unfollow,getFollowers,getFollowing
 follow_router.post('/addFollow',addFollow)
 follow_router.get('/getFollowers/:userID',getFollowers)
-follow_router.get('/getFollowing',getFollowing)
+follow_router.get('/getFollowing/:userID',getFollowing)
 follow_router.post('/unFollow',unFollow)
 
 

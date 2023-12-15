@@ -3,9 +3,9 @@ post http://localhost:5800/post/createPost
 Content-Type: application/json
 
 {
-    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "userID": "30b8726a-f623-4920-a0da-c77d183bbdca",
     "postPic": "nice pics",
-    "content": "good morning Europe"
+    "content": "good morning Africa"
 }
 
 ### get user posts
@@ -13,7 +13,7 @@ get http://localhost:5800/post/getUserPosts
 Content-Type: application/json
 
 {
-    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+    "userID": "30b8726a-f623-4920-a0da-c77d183bbdca"
 }
 
 ### get all posts
@@ -25,5 +25,5 @@ delete http://localhost:5800/post/deletePost
 Content-Type: application/json
 
 {
-    "postID": "9a200abb-9413-435b-953a-27dd45f17dad"
+    "postID": "7a95ac71-9e50-4bdc-a384-d0bd7f467e17"
 }

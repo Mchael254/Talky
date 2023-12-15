@@ -19,7 +19,7 @@ export const addFollow = async (req:Request,res:Response) => {
 
 //get followers
 export const getFollowers = async (req: Request, res: Response) => {
-    const { userID } = req.params;
+    const { userID}  = req.params;
     try {
         const pool = await mssql.connect(sqlConfig);
         const result = await pool.request()
@@ -33,7 +33,7 @@ export const getFollowers = async (req: Request, res: Response) => {
 
 //get following
 export const getFollowing = async (req: Request, res: Response) => {
-    const { userID } = req.body;
+    const { userID } = req.params;
     try {
         const pool = await mssql.connect(sqlConfig);
         const result = await pool.request()

@@ -5,7 +5,7 @@ Content-Type: application/json
 
 {
     "followerID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
-    "followeeID": "30b8726a-f623-4920-a0da-c77d183bbdca" 
+    "followeeID": "93c38333-1f1c-45ea-b30c-f0875af6bb89" 
 }
 
 ### get followers
@@ -13,16 +13,20 @@ get  http://localhost:5800/follow/getFollowers
 Content-Type: application/json
 
 {
-    "userID": "4d087c21-1cc8-48cc-b792-7045b93090bb"
+    "userID": "93c38333-1f1c-45ea-b30c-f0875af6bb89"
     
 }
+### get followers
+GET http://localhost:5800/follow/getFollowers?userID=93c38333-1f1c-45ea-b30c-f0875af6bb89
+Content-Type: application/json
+
 
 ### get following
 get  http://localhost:5800/follow/getFollowing
 Content-Type: application/json
 
 {
-    "userID": "4d087c21-1cc8-48cc-b792-7045b93090bb"
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
     
 }
 
@@ -32,5 +36,5 @@ Content-Type: application/json
 
 {
     "followerID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
-    "followeeID": "30b8726a-f623-4920-a0da-c77d183bbdca" 
+    "followeeID": "93c38333-1f1c-45ea-b30c-f0875af6bb89" 
 }

@@ -52,8 +52,8 @@ export const upload = multer({
 //upload profile pic
 export const uploadProfilePic1 = async (req: Request, res: Response) => {
     try {
-        if(!req.file){
-            console.log('no file uploaded');    
+        if (!req.file) {
+            console.log('no file uploaded');
             return res.status(400).json({ error: 'No file uploaded' });
         }
         const email = req.body.email;
@@ -66,26 +66,27 @@ export const uploadProfilePic1 = async (req: Request, res: Response) => {
         const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`);
         const imageUrl = result.secure_url;
         console.log(imageUrl);
-        
+
         const request = pool.request();
         request.input('email', mssql.VarChar, email);
         request.input('imageUrl', mssql.VarChar, imageUrl);
         const results = await request.query(updateQuery);
-        return res.status(200).json({ message: 'pic upload in progress',
-        
-                                    success: true,
-                                     imageUrl:imageUrl
-                                    });
+        return res.status(200).json({
+            message: 'pic upload in progress',
+
+            success: true,
+            imageUrl: imageUrl
+        });
 
     } catch (error) {
         console.error('Error updating profile pic:', error);
         res.status(500).json({ error: 'Internal Server Error' });
-        
+
     }
 }
 
 
-    //register user
+//register user
 export const registerUser = async (req: Request, res: Response) => {
     try {
         let { userName, email, password } = req.body;
@@ -110,7 +111,7 @@ export const registerUser = async (req: Request, res: Response) => {
             .query(checkUserNameQuery);
 
         if (emailCheckResult.recordset.length > 0 && userNameCheckResult.recordset.length > 0) {
-            return res.status(400).json({ error: 'Email and userName number already exist.' });
+            return res.status(400).json({ error: 'Email and userName already exist.' });
         } else if (emailCheckResult.recordset.length > 0) {
             return res.status(400).json({ error: 'Email already exists' });
         } else if (userNameCheckResult.recordset.length > 0) {
@@ -124,7 +125,10 @@ export const registerUser = async (req: Request, res: Response) => {
             .input("password", mssql.VarChar, hashedPwd)
             .execute("registerUser");
 
-        return res.status(200).json({ message: 'User registered successfully.' });
+        return res.status(200).json({
+            message: 'User registered successfully.',
+            email: 'welcome user email sent to new user'
+        });
     } catch (error) {
         return res.json({
             error: error
@@ -162,8 +166,8 @@ export const loginUser = async (req: Request, res: Response) => {
                 });
             }
             // Include only essential information in the token payload
-            const { userName, email,role } = user[0];
-            const tokenPayload = {  userName, email,role };
+            const { userName, email, role } = user[0];
+            const tokenPayload = { userName, email, role };
 
             const token = jwt.sign(tokenPayload, process.env.SECRET as string, {
                 expiresIn: '36000s',
@@ -286,104 +290,105 @@ export const updateProfile = async (req: Request, res: Response) => {
 //initiate password reset
 export const initiate_password_reset = async (req: Request, res: Response) => {
     try {
-      const { email } = req.body;
-      const { error } = passwordResetRequestValidationSchema.validate(req.body);
-  
-      if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-      }
-  
-      const resetToken = generateRandomToken();
-      const expiryTime = calculateExpiryTime();
-  
-      const pool = await mssql.connect(sqlConfig);
-  
-      const resetResult = await pool
-        .request()
-        .input('email', mssql.VarChar, email)
-        .input('resetToken', mssql.VarChar, resetToken)
-        .input('expiryTime', mssql.Numeric, expiryTime)
-        .execute('initiate_password_reset');
-  
-      if (resetResult.recordset && resetResult.recordset.length > 0) {
-        const message = resetResult.recordset[0].message;
-        if (message === 'Password reset initiated') {
-          return res.status(200).json({ message: `password reset initiated check ${email} for more details` });
-        } else {
-          return res.status(400).json({ message: 'email not found.' });
+        const { email } = req.body;
+        const { error } = passwordResetRequestValidationSchema.validate(req.body);
+
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
         }
-      } else {
-        return res.status(500).json({
-          message: 'Error initiating password reset',
-        });
-      }
+
+        const resetToken = generateRandomToken();
+        const expiryTime = calculateExpiryTime();
+
+        const pool = await mssql.connect(sqlConfig);
+
+        const resetResult = await pool
+            .request()
+            .input('email', mssql.VarChar, email)
+            .input('resetToken', mssql.VarChar, resetToken)
+            .input('expiryTime', mssql.Numeric, expiryTime)
+            .execute('initiate_password_reset');
+
+        if (resetResult.recordset && resetResult.recordset.length > 0) {
+            const message = resetResult.recordset[0].message;
+            if (message === 'Password reset initiated') {
+                return res.status(200).json({ message: `password reset initiated check ${email} for more details`,
+             });
+            } else {
+                return res.status(400).json({ message: 'email not found.' });
+            }
+        } else {
+            return res.status(500).json({
+                message: 'Error initiating password reset',
+            });
+        }
     } catch (error: any) {
-      console.error('Error with the password reset', error);
-      return res.status(500).json({
-        message: 'Internal Server Error',
-        error: error.message,
-      });
+        console.error('Error with the password reset', error);
+        return res.status(500).json({
+            message: 'Internal Server Error',
+            error: error.message,
+        });
     }
-  };
-  
-  const generateRandomToken = () => {
+};
+
+const generateRandomToken = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  };
-  
-  const calculateExpiryTime = () => {
+};
+
+const calculateExpiryTime = () => {
     return Math.floor(Date.now() / 1000) + 3600;
-  };
-  
-  
-  //reset password
-  export const resetPassword = async (req: Request, res: Response) => {
+};
+
+
+//reset password
+export const resetPassword = async (req: Request, res: Response) => {
     try {
-      const { email, newPassword, token } = req.body;
-  
-      const { error } = passwordResetValidationSchema.validate(req.body);
-  
-      if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-      }
-  
-      const hashedPwd = await bcrypt.hash(newPassword, 5);
-  
-      const pool = await mssql.connect(sqlConfig);
-  
-      const resetResult = await pool
-        .request()
-        .input('email', mssql.VarChar, email)
-        .input('newPassword', mssql.VarChar, hashedPwd)
-        .input('token', mssql.VarChar, token)
-        .execute('updatePassword');
-  
-      if (resetResult.recordset && resetResult.recordset.length > 0) {
-        const message = resetResult.recordset[0].message;
-  
-        if (message === 'Password updated successfully') {
-          return res.status(200).json({ message: 'Password reset successful' });
-        } else if (message === 'Invalid token') {
-          return res.status(400).json({ message: 'Invalid reset token' });
-        } else if (message === 'Invalid email') {
-          return res.status(400).json({ message: 'Invalid email' });
-        } else {
-          return res.status(500).json({
-            message: 'Error resetting password',
-          });
+        const { email, newPassword, token } = req.body;
+
+        const { error } = passwordResetValidationSchema.validate(req.body);
+
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
         }
-      } else {
-        return res.status(500).json({
-          message: 'Error resetting password',
-        });
-      }
+
+        const hashedPwd = await bcrypt.hash(newPassword, 5);
+
+        const pool = await mssql.connect(sqlConfig);
+
+        const resetResult = await pool
+            .request()
+            .input('email', mssql.VarChar, email)
+            .input('newPassword', mssql.VarChar, hashedPwd)
+            .input('token', mssql.VarChar, token)
+            .execute('updatePassword');
+
+        if (resetResult.recordset && resetResult.recordset.length > 0) {
+            const message = resetResult.recordset[0].message;
+
+            if (message === 'Password updated successfully') {
+                return res.status(200).json({ message: 'Password reset successful' });
+            } else if (message === 'Invalid token') {
+                return res.status(400).json({ message: 'Invalid reset token' });
+            } else if (message === 'Invalid email') {
+                return res.status(400).json({ message: 'Invalid email' });
+            } else {
+                return res.status(500).json({
+                    message: 'Error resetting password',
+                });
+            }
+        } else {
+            return res.status(500).json({
+                message: 'Error resetting password',
+            });
+        }
     } catch (error: any) {
-      console.error('Error with the password reset', error);
-      return res.status(500).json({
-        message: 'Internal Server Error',
-        error: error.message,
-      });
+        console.error('Error with the password reset', error);
+        return res.status(500).json({
+            message: 'Internal Server Error',
+            error: error.message,
+        });
     }
-  };
+};
 
 
 
@@ -401,7 +406,7 @@ export const initiate_password_reset = async (req: Request, res: Response) => {
 
 
 
-  
+
 
 
 

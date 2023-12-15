@@ -3,7 +3,7 @@ post http://localhost:5800/likes/likeComment
 Content-Type: application/json
 
 {
-    "commentID": "4713a02a-6c21-46bc-ad04-0284bcebf01d",
+    "commentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963",
     "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
 }
 
@@ -13,7 +13,7 @@ post http://localhost:5800/likes/unlikeComment
 Content-Type: application/json
 
 {
-    "commentID": "4713a02a-6c21-46bc-ad04-0284bcebf01d",
+    "commentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963",
     "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
 }
 
@@ -22,7 +22,7 @@ post http://localhost:5800/likes/likePost
 Content-Type: application/json
 
 {
-    "postID": "362a4897-4288-42ef-b82e-08b5b2e05a8d",
+    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4",
     "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
     "userName": "dogo"
 }
@@ -32,7 +32,7 @@ post http://localhost:5800/likes/unlikePost
 Content-Type: application/json
 
 {
-    "postID": "362a4897-4288-42ef-b82e-08b5b2e05a8d",
+    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4",
     "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
     
 }

@@ -3,10 +3,10 @@ post http://localhost:5800/comment/commentOnPost
 Content-Type: application/json
 
 {
-    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
-    "postID": "9a200abb-9413-435b-953a-27dd45f17dad" ,
-    "content": "like comment on post",
-    "userName": "dogo"
+    "userID": "9595ba2e-b289-49c8-a0de-291aa56fb501",
+    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4" ,
+    "content": "we are both in the 10%",
+    "userName": "mike"
 }
 
 ### get all comments on post
@@ -14,7 +14,7 @@ get http://localhost:5800/comment/getPostComments
 Content-Type: application/json
 
 {
-    "postID": "9a200abb-9413-435b-953a-27dd45f17dad"
+    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4"
 }
 
 ### comment on comment
@@ -23,9 +23,9 @@ Content-Type: application/json
 
 {
     "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
-    "postID": "9a200abb-9413-435b-953a-27dd45f17dad" ,
-    "parentCommentID": "7e7bc79a-2dbc-439b-8d1d-66821798bea8" ,
-    "content": "C02 is death",
+    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4" ,
+    "parentCommentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963" ,
+    "content": "go home",
     "userName": "dogo"
 }
 
@@ -34,7 +34,7 @@ get http://localhost:5800/comment/getCommentsOnComment
 Content-Type: application/json
 
 {
-    "commentID": "7e7bc79a-2dbc-439b-8d1d-66821798bea8"
+    "commentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963"
 }
 
 ### update comment
@@ -42,8 +42,8 @@ put http://localhost:5800/comment/updateComment
 Content-Type: application/json
 
 {
-    "commentID": "8c7ff016-695b-4322-ae2c-306fbe20e310",
-    "updatedContent": "sorry C02 gives plant life",
+    "commentID": "90e9836d-4c0d-47e4-949d-22594cec7eb3",
+    "updatedContent": "no i changed my mind sorry",
     "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
 }
 
@@ -52,6 +52,6 @@ delete http://localhost:5800/comment/deleteComment
 Content-Type: application/json
 
 {
-    "commentID": "7e7bc79a-2dbc-439b-8d1d-66821798bea8",
-    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+    "commentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963",
+    "userID": "9595ba2e-b289-49c8-a0de-291aa56fb501"
 }

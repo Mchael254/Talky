@@ -1,9 +1,11 @@
 import express from 'express'
 import cron from 'node-cron'
 import { welcomeUser } from './mailservices/welcomeUser';
+import dotenv from 'dotenv'
+import { resetPassword } from './mailservices/resetPassword';
 
-
-
+dotenv.config();
+const port = process.env.PORT || 4400;
 const app = express();
 const run = async()=>{
    
@@ -12,6 +14,7 @@ const run = async()=>{
         console.log('check reset password');
         
          welcomeUser();
+         resetPassword();
      
          
     });

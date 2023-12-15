@@ -10,7 +10,9 @@ export class UserService {
 
   private apiUrl = 'http://localhost:5800/user';
   private photoUrl = 'http://localhost:5800/user/uploadProfilePic';
-  private postUrl = 'http://localhost:5800/post';
+  private postsUrl = 'http://localhost:5800/post';
+  private followUrl = 'http://localhost:5800/follow';
+  private createPostUrl = 'http://localhost:5800/post/createPost';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -21,7 +23,7 @@ export class UserService {
 
   //follow user
   followUser(followData: any): Observable<any> {
-    return this.http.post(`${this.postUrl}/addFollow`, followData);
+    return this.http.post(`${this.postsUrl}/addFollow`, followData);
   }
 
   //update profile
@@ -34,10 +36,29 @@ export class UserService {
     return this.http.post(this.photoUrl, formData, options);
   }
 
-  //get followers
-  getFollowers(userID: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.postUrl}/getFollowers/${userID}`);
+  getFollowers(userID: string): Observable<any> {
+    const url = `${this.followUrl}/getFollowers/${userID}`;
+    return this.http.get(url);
   }
+
+  getFollowing(userID: string): Observable<any> {
+    const url = `${this.followUrl}/getFollowing/${userID}`;
+    return this.http.get(url);
+  }
+
+  getUserPosts(userID: string): Observable<any> {
+    const url = `${this.postsUrl }/getUserPosts/${userID}`;
+    return this.http.get(url);
+  }
+
+  getAllPosts(): Observable<any> {
+    return this.http.get(this.postsUrl);
+  }
+
+  createPost(postData: FormData, options?: any): Observable<any> {
+    return this.http.post(this.createPostUrl, postData, options);
+  }
+
 
 
 

@@ -49,8 +49,8 @@
       <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent successfully</p>
       <button (click)="cancel()" id="cancel">X</button>
       <div class="postContent">
-        <img src="{{image}}" alt="">
-        <textarea type="text" [(ngModel)]="textPost" placeholder="Whats on your mind .."></textarea>
+        <img [src]="matchingUserDp" alt="userProfile">
+        <textarea type="text" [(ngModel)]="content" name="content" placeholder="Whats on your mind .."></textarea>
       </div>
       <div class="postMedia">
         <div class="galleryPost">
@@ -58,12 +58,12 @@
             <label class="material-symbols-outlined" for="fileInput">
               add_photo_alternate
             </label>
-            <input type="file" id="fileInput" (change)="previewImage($event)">
+            <input type="file" name="postPic" id="fileInput" (change)="previewImage($event)"  (change)="onSelected($event)">
           </div>
         </div>
         <img class="" *ngIf="imagePreview" [src]="imagePreview" alt="Image Preview" id="imagePreview"
           (click)="closePreview()">
-        <button>POST</button>
+        <button (click)="sharePost()">POST</button>
       </div>
     </div>
   </div>
@@ -146,64 +146,60 @@
       <div *ngIf="personalContent" class="content">
         <div class="bar">
           <div class="barParts">
-            <div class="line" *ngIf="linep"></div>
-            <button (click)="posts()">Post</button>
+            <button (click)="getUserPosts()" [class.active]="linep">Post</button>
           </div>
           <div class="barParts">
-            <div class="line" *ngIf="linem"></div>
-            <button (click)="media()">Media</button>
+            <button (click)="getFollowers()" [class.active]="linefl">Followers</button>
           </div>
           <div class="barParts">
-            <div class="line" *ngIf="linef"></div>
-            <button (click)="getFollowers()">Followers</button>
-          </div>
-          <div class="barParts">
-            <div class="line" *ngIf="linel"></div>
-            <button (click)="following()">Following </button>
+            <button (click)="getFollowing()" [class.active]="lineFollowing">Following </button>
           </div>
         </div>
 
-        <div *ngIf="general" class="general">
-          <div *ngIf="folowers" class="follower">
-            <div *ngFor="let follower of followerss" class="follower">
-              <img [src]="follower.imagePath" alt="">
-              <p style="font-weight: bold;">{{follower.userName}}</p>
-              <button>View</button>
-            </div>
+        <div *ngIf="generalFollower" class="general">
+          <div *ngIf="followerss.length <1;" class="noFollowers">
+            <p>No followers yet.</p>
           </div>
-
-          <div *ngIf="folowing" class="follower">
-            <img src="{{image}}" alt="">
-            <p style="font-weight: bold;">useName </p>
-            <button>Follow</button>
+          <div *ngFor="let follower of followerss" class="follower">
+            <img [src]="follower.imagePath" alt="">
+            <p style="font-weight: bold;">{{follower.userName}}</p>
             <button>View</button>
           </div>
         </div>
 
-        <div *ngIf="post" class="postsC">
-          <div class="postCard">
-            <p>Post</p>
-            <img src="{{image}}" alt="">
+        <div *ngIf="magic" class="general">
+          <div *ngIf="followings.length <1;" class="noFollowers">
+            <p>Not following yet.</p>
           </div>
-          <div class="postCard">
-            <p>Post</p>
-            <img src="{{image}}" alt="">
-          </div>
-          <div class="postCard">
-            <p>Post</p>
-            <img src="{{image}}" alt="">
-          </div>
-          <div class="postCard">
-            <p>Post</p>
-            <img src="{{image}}" alt="">
+          <div *ngFor="let following of followings" class="follower">
+            <img [src]="following.imagePath" alt="">
+            <p style="font-weight: bold;">{{following.userName}}</p>
+            <button>View</button>
           </div>
         </div>
 
-        <div *ngIf="medias" class="postsC">
-          <div class="postCard">
-            <img src="{{image}}" alt="">
+        <div *ngIf="userPosts" class="postsC">
+          <div *ngFor="let post of userPostss" class="feed">
+            <div class="speak">
+              <div class="speakImage">
+                <img [src]="matchingUserDp">
+                <ng-template #defaultImage>
+                  <img [src]="'../../assets/talk.png'" alt="Default Image">
+                </ng-template>
+              </div>
+              <div class="speakMessage">
+                <div class="speakDetails">
+                  <h3>{{post.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3>
+                </div>
+                <p style="color: rgb(82, 77, 77);">{{post.content}}</p>
+                <img *ngIf="post.postPic !== null" [src]="post.postPic" alt="">
+              </div>
+
+
+            </div>
           </div>
         </div>
+
       </div>
 
       <!-- other profile contents -->
@@ -211,30 +207,32 @@
         <div class="bar">
           <div class="barParts">
             <div class="line" *ngIf="linep"></div>
-            <button (click)="posts()">Posts</button>
+            <button (click)="getUserPosts()">Posts</button>
           </div>
           <div class="barParts">
             <div class="line" *ngIf="linem"></div>
             <button (click)="media()">Media</button>
           </div>
           <div class="barParts">
-            <div class="line" *ngIf="linef"></div>
-            <button (click)="followers()">Followers</button>
+            <button (click)="getFollowers()" *ngIf="linefl">Followers</button>
           </div>
           <div class="barParts">
             <div class="line" *ngIf="linel"></div>
-            <button (click)="following()">Following </button>
+            <button (click)="getFollowing()">Following </button>
           </div>
         </div>
 
-        <div *ngIf="general" class="general">
+        <div *ngIf="generalFollower" class="general">
           <div *ngIf="folowers" class="follower">
             <img src="{{image}}" alt="">
             <p style="font-weight: bold;">userName </p>
             <button>Follow</button>
             <button>View</button>
           </div>
+        </div>
 
+
+        <div *ngIf="generalFollower" class="general">
           <div *ngIf="folowing" class="follower">
             <img src="{{image}}" alt="">
             <p style="font-weight: bold;">useName </p>
@@ -243,7 +241,7 @@
           </div>
         </div>
 
-        <div *ngIf="post" class="postsC">
+        <div *ngIf="userPosts" class="postsC">
           <div class="postCard">
             <p>Post</p>
             <img src="{{image}}" alt="">
@@ -256,16 +254,7 @@
             <p>Post</p>
             <img src="{{image}}" alt="">
           </div>
-          <div class="postCard">
-            <p>Post</p>
-            <img src="{{image}}" alt="">
-          </div>
-        </div>
 
-        <div *ngIf="medias" class="postsC">
-          <div class="postCard">
-            <img src="{{image}}" alt="">
-          </div>
         </div>
       </div>
     </div>
@@ -277,20 +266,39 @@
         <button (click)="yourFollower()">Following</button>
         <button (click)="yourFollowin()">For you </button>
       </div>
-      <div *ngFor="let user of filteredUsers" class="feed">
-        <div class="speak">
-          <div class="speakImage">
-            <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture">
-          </div>
-          <div class="speakMessage">
-            <div class="speakDetails">
-              <h3>{{user.userName}} <span style="font-size: 20px;color: #575555;">2h</span></h3>
+      <div *ngFor="let post of allPostss" class="feed">
+
+          <div class="speak">
+            <div class="speakImage">
+              <img [src]="matchingUserDp">
+              <ng-template #defaultImage>
+                <img [src]="'../../assets/talk.png'" alt="Default Image">
+              </ng-template>
             </div>
-            <p style="color: rgb(82, 77, 77);">{{postq}}</p>
-            <img src="{{image}}" alt="">
+            <div class="speakMessage">
+              <div class="speakDetails">
+                <h3>{{post.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3>
+              </div>
+              <p style="color: rgb(82, 77, 77);">{{post.content}}</p>
+              <img *ngIf="post.postPic !== null" [src]="post.postPic" alt="">
+            </div>
+
+
           </div>
 
-        </div>
+        <!-- <div class="speak"> -->
+          <!-- <div class="speakImage"> -->
+            <!-- <!~~ <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture"> ~~> -->
+          <!-- </div> -->
+          <!-- <div *ngFor="let post of allPostss" class="speakMessage"> -->
+            <!-- <div class="speakDetails"> -->
+              <!-- <!~~ <h3>{{user.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3> ~~> -->
+            <!-- </div> -->
+            <!-- <p style="color: rgb(82, 77, 77);">{{post.content}}</p> -->
+            <!-- <img [src]="post.postPic" alt=""> -->
+          <!-- </div> -->
+
+        <!-- </div> -->
         <div class="impress">
           <button (click)="toggleFavorite()" [class.active]="isFavorite">
             <span class="material-symbols-outlined" [class.active]="isFavorite"
@@ -304,7 +312,8 @@
 
           <div *ngIf="modal" class="modal"></div>
           <div *ngIf="postss1" class="postsD" style="height: 60vh;width:40vw;padding: 20px;border-radius: 15px;">
-            <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent successfully
+            <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent
+              successfully
             </p>
             <button (click)="cancel()" id="cancel">X</button>
             <div class="postContent" style="height: auto;min-height: 3vh;">
@@ -332,7 +341,7 @@
     <!-- specified feeds -->
     <div *ngIf="feeds1" class="feeds">
       <div class="foll">
-        <button>Following</button>
+        <button (click)="yourFollower()">Following</button>
         <button>For you </button>
       </div>
       <div *ngFor="let user of filteredUsers" class="feed">
@@ -362,7 +371,8 @@
 
           <div *ngIf="modal" class="modal"></div>
           <div *ngIf="postss1" class="postsD" style="height: 60vh;width:40vw;padding: 20px;border-radius: 15px;">
-            <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent successfully
+            <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent
+              successfully
             </p>
             <button (click)="cancel()" id="cancel">X</button>
             <div class="postContent" style="height: auto;min-height: 3vh;">
@@ -452,6 +462,3 @@
 
 
   </div>
-
-
-</div>

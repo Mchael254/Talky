@@ -17,6 +17,7 @@ export class UserComponent {
   ngOnInit() {
     this.fetchAllUsers();
     this.fetchProfile();
+    this.getAllPosts();
 
   }
 
@@ -133,6 +134,56 @@ export class UserComponent {
   }
 
   //upload profile pic
+
+//use multer
+  // sendImage(): void {
+  //   const userID = this.updateID;
+  //   const profilePic = this.imagePreview;
+
+  //   if (profilePic) {
+  //     // Convert base64 to Blob
+  //     const base64Image = profilePic as string;
+  //     const byteCharacters = atob(base64Image.split(',')[1]);
+  //     const byteNumbers = new Array(byteCharacters.length);
+  //     for (let i = 0; i < byteCharacters.length; i++) {
+  //       byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //     }
+  //     const byteArray = new Uint8Array(byteNumbers);
+  //     const blob = new Blob([byteArray], { type: 'image/png' });
+
+  //     const formData = new FormData();
+  //     formData.append('userID', userID.toString());
+  //     formData.append('profilePic', blob);
+
+  //     this.userService.uploadProfilePic(formData).subscribe(
+  //       (response) => {
+  //         console.log('Profile pic uploaded successfully:', response);
+  //       },
+  //       (error) => {
+  //         console.error('Error uploading profile pic:', error);
+  //       }
+  //     );
+  //   } else {
+  //     console.error('Profile pic is null or invalid.');
+  //   }
+  // }
+
+  //post form
+  modal: boolean = false;
+  postss: boolean = false;
+  sentSuccess: boolean = false;
+  cancel() {
+    this.modal = false;
+    this.postss = false;
+    this.postss1 = false;
+  }
+
+  content: string = '';
+  POST() {
+    this.postss = true;
+    this.modal = true;
+  }
+  //create post
   imagePreview: string | ArrayBuffer | null = null;
   previewImage(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
@@ -154,62 +205,61 @@ export class UserComponent {
     this.imagePreview = null;
   }
 
-  sendImage(): void {
-    const userID = this.updateID;
-    const profilePic = this.imagePreview;
-
-    if (profilePic) {
-      // Convert base64 to Blob
-      const base64Image = profilePic as string;
-      const byteCharacters = atob(base64Image.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
-
-      const formData = new FormData();
-      formData.append('userID', userID.toString());
-      formData.append('profilePic', blob);
-
-      this.userService.uploadProfilePic(formData).subscribe(
-        (response) => {
-          console.log('Profile pic uploaded successfully:', response);
-        },
-        (error) => {
-          console.error('Error uploading profile pic:', error);
-        }
-      );
-    } else {
-      console.error('Profile pic is null or invalid.');
+  FileInput() {
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+      fileInput.click();
     }
   }
 
-  //post form
-  modal: boolean = false;
-  postss: boolean = false;
-  sentSuccess: boolean = false;
-  cancel() {
-    this.modal = false;
-    this.postss = false;
-    this.postss1 = false;
+  selectedImg: File | null = null;
+  onSelected(event: any): void {
+    this.previewImage(event);
+    const fileList: FileList | null = event.target.files;
+    if (fileList && fileList.length > 0) {
+      this.selectedImage = fileList[0];
+    }
+  }
+  sharePost() {
+    const userID = this.matchingUser.userID;
+    const userName = this.matchingUser.userName;
+    const content = this.content;
+
+    const postData = new FormData();
+    postData.append('content', this.content);
+    postData.append('userID', userID);
+    postData.append('userName', userName);
+
+    if (this.selectedImage) {
+      postData.append('postPic', this.selectedImage);
+    } else {
+      console.log('Please select an image to upload');
+      this.userService.createPost(postData).subscribe(
+        (response) => {
+          console.log(response);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      return;
+    }
+    console.log(postData);
+    this.userService.createPost(postData).subscribe(
+      (response) => {
+        this.compareAndRetrieveDetails();
+        console.log(response);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   }
 
-  textPost: string = '';
-  POST() {
-    this.postss = true;
-    this.modal = true;
-  }
 
   profile: boolean = false;
   image: string = "../../assets/vingego.jpeg";
   feeds: boolean = true;
-
-  linem: boolean = false;
-  linef: boolean = false;
-  linep: boolean = true;
-  linel: boolean = false;
 
   viewHome() {
     this.profile = false;
@@ -247,53 +297,136 @@ export class UserComponent {
     this.otherContent = false;
   }
 
-  setLineStatus(m: boolean, f: boolean, p: boolean, l: boolean): void {
-    this.linem = m;
-    this.linef = f;
-    this.linep = p;
-    this.linel = l;
-  }
+  //top lines
+  linep: boolean = true;
+  linem: boolean = false;
+  linefl: boolean = false;
+  linel: boolean = false;
 
-  setContentStatus(p: boolean, m: boolean, fl: boolean, fw: boolean): void {
-    this.post = p;
-    this.medias = m;
-    this.folowers = fl;
-    this.folowing = fw;
-  }
+  gFollowing: boolean = false;
 
-  general: boolean = false;
+
+  generalFollower: boolean = false;
+  magic: boolean = false;
   //followers
   folowers: boolean = false;
-  followers() {
-    this.setLineStatus(false, true, false, false);
-    this.setContentStatus(false, false, true, false);
-    this.general = true;
-    this.folowers = false;
+  lineFollowing: boolean = false;
+
+  //get user following
+  folowing: boolean = false;
+  followings: any[] = [];
+  getFollowing() {
+    this.lineFollowing = true; this.linem = false; this.linep = false; this.linefl = false;
+    this.magic = true; this.generalFollower = false; this.medias = false; this.userPosts = false;
+    const userID = this.matchingUser.userID;
+    console.log(userID);
+    this.userService.getFollowing(userID).subscribe(
+      (response) => {
+        console.log('Following:', response);
+        this.followings = response;
+      },
+      (error) => {
+        console.error('Error getting following:', error);
+      }
+    );
+  }
+  //get user followers
+  followerss: any[] = [];
+  getFollowers() {
+    this.lineFollowing = false; this.linem = false; this.linep = false; this.linefl = true;
+    this.generalFollower = true; this.magic = false; this.medias = false; this.userPosts = false;
+    const userID = this.matchingUser.userID;
+    console.log(userID);
+    this.userService.getFollowers(userID).subscribe(
+      (response) => {
+        console.log('Followers:', response);
+        this.followerss = response;
+      },
+      (error) => {
+        console.error('Error getting followers:', error);
+      }
+    );
+  }
+  //get user posts
+  userPostss: any[] = [];
+  userPosts: boolean = true;
+  time: string = '';
+  getUserPosts() {
+    this.linep = true; this.linem = false; this.linefl = false; this.lineFollowing = false;
+    this.userPosts = true; this.medias = false; this.generalFollower = false; this.magic = false;
+    const userID = this.matchingUser.userID;
+    console.log(userID);
+    this.userService.getUserPosts(userID).subscribe(
+      (response) => {
+        console.log('Posts:', response);
+        this.userPostss = response;
+        this.userPostss.forEach((post) => {
+          const postTimestamp = new Date(post.Timestamp);
+          const eastTimestamp = this.convertToEastAfricanTime(postTimestamp);
+          const currentTime = new Date();
+          const timeDifference = this.getTimeDifference(eastTimestamp, currentTime);
+          post.timeDifference = timeDifference;
+          this.time = timeDifference;
+          console.log(this.time);
+
+        });
+      },
+      (error) => {
+        console.error('Error getting posts:', error);
+      }
+    );
+  }
+  convertToEastAfricanTime(timestamp: Date): Date {
+    const eatOffset = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+    return new Date(timestamp.getTime() - eatOffset);
   }
 
-  //following
-  folowing: boolean = false;
-  following() {
-    this.setLineStatus(false, false, false, true);
-    this.setContentStatus(false, false, false, true);
-    this.general = true;
+  getTimeDifference(start: Date, end: Date): string {
+    const timeDiff = Math.abs(end.getTime() - start.getTime());
+    const days = Math.floor(timeDiff / (1000 * 3600 * 24));
+    const hours = Math.floor((timeDiff % (1000 * 3600 * 24)) / (1000 * 3600));
+    const minutes = Math.floor((timeDiff % (1000 * 3600)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    let result = '';
+    if (days > 0) result += days + 'd ';
+    if (hours > 0) result += hours + 'h ';
+    if (minutes > 0 && hours === 0) result += minutes + 'm ';
+    if (seconds > 0 && hours === 0 && minutes === 0) result += seconds + 's';
+
+    return result.trim();
+  }
+
+  //get all posts
+  allPostss: any[] = [];
+  getAllPosts() {
+    this.userService.getAllPosts().subscribe(
+      (response) => {
+        console.log('Posts:', response);
+        this.allPostss = response;
+      },
+      (error) => {
+        console.error('Error getting posts:', error);
+      }
+    );
   }
 
   //media
   medias: boolean = false;
   media() {
-    this.setLineStatus(true, false, false, false);
-    this.setContentStatus(true, true, false, false);
-    this.post = false;
-    this.general = false;
+    this.linem = true; this.linep = false; this.linel = false; this.linefl = false;
+    this.medias = true; this.userPosts = false; this.folowing = false;
+    this.userPosts = false; this.generalFollower = false; this.magic = false;
+
 
   }
 
   //post
-  post: boolean = false;
+
   posts() {
-    this.setLineStatus(false, false, true, false);
-    this.setContentStatus(true, false, false, false);
+    this.linep = true; this.linem = false; this.lineFollowing = false; this.linefl = false;
+    this.userPosts = true; this.medias = false; this.generalFollower = false; this.magic = false;
+
   }
 
   otherUser: any;
@@ -496,21 +629,6 @@ export class UserComponent {
     );
   }
 
-  followerss: any[] = [];
-  getFollowers() {
-    const userID = this.matchingUser.userID;
-    console.log(userID);
-    this.userService.getFollowers(userID).subscribe(
-      (response) => {
-        console.log('Followers:', response);
-        this.followerss = response;
-        this.folowers = true
-      },
-      (error) => {
-        console.error('Error getting followers:', error);
-      }
-    );
-  }
 
   unfollowUser() {
     this.unfolUser = false;
@@ -548,6 +666,8 @@ export class UserComponent {
 
 
   yourFollower() {
+    this.feeds1 = false;
+    this.feeds = true;
 
   }
   yourFollowin() {

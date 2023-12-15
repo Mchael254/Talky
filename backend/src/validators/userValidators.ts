@@ -61,7 +61,7 @@ export const passwordResetValidationSchema = joi.object({
         }
     }),
     newPassword:joi.string().required().pattern(
-        new RegExp ('^[a-zA-Z0-9!@#%$&*()]{0,30}$')
+        new RegExp ('^[a-zA-Z0-9!@#%$&*().]{0,30}$')
     ),
     token:joi.string().required().min(2).max(300),
 

@@ -1,0 +1,29 @@
+-- use Talky
+
+-- CREATE or alter PROCEDURE GetFollowers (
+--     @p_userID VARCHAR(300)
+-- )
+-- as
+-- BEGIN
+--     SELECT Users.* FROM Users
+--     JOIN Follows ON Users.userID = Follows.followerID
+--     WHERE Follows.followeeID = @p_userID;
+-- END;
+
+-- CREATE OR ALTER PROCEDURE GetFollowers (
+--     @p_userID VARCHAR(300)
+-- )
+-- AS
+-- BEGIN
+--     SELECT
+--         U.userName,
+--         U.followCount,
+--         U.followingCount,
+--         U.imagePath
+--     FROM
+--         Users U
+--     JOIN
+--         Follows F ON U.userID = F.followerID
+--     WHERE
+--         F.followeeID = @p_userID;
+-- END;

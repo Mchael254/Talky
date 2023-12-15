@@ -1,0 +1,25 @@
+use Talky
+
+--unlike comment
+-- CREATE OR ALTER PROCEDURE UnlikeComment
+--     @commentID varchar(300),
+--     @userID varchar(300)
+-- AS
+-- BEGIN
+--     BEGIN TRY
+--         DELETE FROM CommentLikes
+--         WHERE commentID = @commentID AND userID = @userID;
+--         IF @@ROWCOUNT > 0
+--         BEGIN
+--             UPDATE Comments
+--             SET likesCount = CASE 
+--                                 WHEN likesCount > 0 THEN likesCount - 1 
+--                                 ELSE 0 
+--                              END
+--             WHERE commentID = @commentID;
+--         END
+--     END TRY
+--     BEGIN CATCH
+--         THROW;
+--     END CATCH
+-- END;

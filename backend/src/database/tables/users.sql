@@ -20,17 +20,31 @@ use Talky
 --     profilePic varbinary(max)
     
 -- -- )
+alter table Users
+drop column profilePic
+
+ALTER TABLE Users
+-- ADD followCount INT DEFAULT 0;
+ADD followingCount INT DEFAULT 0;
+
+delete from Users
+where email = 'mike@yopmail.com'
+
 alter table Users 
+add imagePath varchar(855) null
 -- ALTER TABLE Users
 -- DROP CONSTRAINT DF__Users__following__3D5E1FD2;
 
 -- DROP INDEX [IndexName] ON Users;
 
 
-drop column following
+-- drop column following
 
 use Talky
 -- alter table Users
-update Users
-set role  = 'admin'
-where userID = '069e804d-97ba-4756-aee7-5943ae8f8f6c'
+-- update Users
+-- set followCount  = 0
+-- where userID = 'a5c1dee3-8c3a-4b80-abab-5389e8ad5455'
+
+
+

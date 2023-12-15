@@ -1,0 +1,24 @@
+use Talky
+
+--like a post
+-- CREATE OR ALTER PROCEDURE likePost
+--     @likeID varchar(300),
+--     @postID varchar(300),
+--     @userID varchar(300),
+--     @userName VARCHAR(255)
+-- AS
+-- BEGIN
+--     BEGIN TRY
+--         INSERT INTO postLikes (likeID, postID, userID,userName)
+--         VALUES (@likeID, @postID, @userID,@userName);
+--         IF @@ROWCOUNT > 0
+--         BEGIN
+--             UPDATE Posts
+--             SET likesCount = likesCount + 1
+--             WHERE postID = @postID;
+--         END
+--     END TRY
+--     BEGIN CATCH
+--         THROW;
+--     END CATCH
+-- END;

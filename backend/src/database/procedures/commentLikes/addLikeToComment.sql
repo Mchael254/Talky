@@ -1,0 +1,23 @@
+-- use Talky
+
+-- CREATE OR ALTER PROCEDURE AddLikeToComment
+--     @likeID varchar(300),
+--     @commentID varchar(300),
+--     @userID varchar(300)
+-- AS
+-- BEGIN
+--     BEGIN TRY
+--         INSERT INTO CommentLikes (likeID, commentID, userID)
+--         VALUES (@likeID, @commentID, @userID);
+--         IF @@ROWCOUNT > 0
+--         BEGIN
+--             UPDATE Comments
+--             SET likesCount = likesCount + 1
+--             WHERE commentID = @commentID;
+--         END
+--     END TRY
+--     BEGIN CATCH
+--         THROW;
+--     END CATCH
+-- END;
+

@@ -1,0 +1,162 @@
+
+//setting up storage
+// const storageEngine = multer.diskStorage({
+//     destination:'./pol',
+//     filename:(req,file,cb)=>{
+//         cb(null,file.originalname + '-' + Date.now() + '.png')
+//     }
+// })
+
+
+//check file type
+function checkFileType(file: any, cb: any) {
+    const fileTypes = /jpeg|jpg|png|gif|jfif/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+        return cb(null, true);
+    } else {
+        cb('Error: Images Only!');
+    }
+}
+
+//init upload (single file)
+export const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1000000000 },
+    fileFilter: function (req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single('profilePic');
+
+//init upload (multiple files)     change the file anywhere else to files
+export const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1000000000 },
+    fileFilter: function (req, files, cb) {
+        checkFileType(files, cb);
+    }
+}).array('profilePic',4);
+
+
+//uploading image to cloudinary
+export const uploadProfilePic1 = async (req: Request, res: Response) => {
+    try {
+        if(!req.file){
+            console.log('no file uploaded');    
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        const userID = req.body.userID;
+        const pool = await mssql.connect(sqlConfig);
+        const updateQuery = `
+            UPDATE Users
+            SET imagePath = @imageUrl
+            WHERE userID = @UserID
+        `;
+        // const result = await cloudinary.uploader.upload(req.file.buffer)
+        const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`);
+        const imageUrl = result.secure_url;
+        console.log(imageUrl);
+        
+        const request = pool.request();
+        request.input('UserID', mssql.VarChar, userID);
+        request.input('imageUrl', mssql.VarChar, imageUrl);
+        const results = await request.query(updateQuery);
+        return res.status(200).json({ message: 'pic upload in progress',
+        
+                                    success: true,
+                                     imageUrl:imageUrl
+                                    });
+
+    } catch (error) {
+        console.error('Error updating profile pic:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+        
+    }
+}
+
+uploading image to database
+export const uploadProfilePic = async (req: Request, res: Response) => {
+    try {       
+        const userID = req.body.userID;
+        console.log(userID);
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        if (!req.file.mimetype.startsWith('image/')) {
+            return res.status(400).json({ error: 'Uploaded file is not an image' });
+        }
+        const pool = await mssql.connect(sqlConfig);
+        const updateQuery = `
+            UPDATE Users
+            SET profilePic = @profilePic
+            WHERE userID = @UserID
+        `;
+
+    //   console.log('Cloudinary upload result:', results);
+        const request = pool.request();
+        request.input('UserID', mssql.VarChar, userID);
+        
+        const file = req.file;
+        console.log('File Object:', file);
+        console.log('File Buffer:', file.buffer);
+
+        console.log('File Type:', file.mimetype);
+        console.log('File Extension:', path.extname(file.originalname));
+        console.log('File MIME Type:', file.mimetype);
+        request.input('profilePic', mssql.VarBinary, file.buffer);
+
+        const result = await request.query(updateQuery);
+        const rowsAffected = result.rowsAffected[0];
+
+        if (rowsAffected > 0) {
+            console.log('User profile pic updated successfully:', result);
+            res.status(200).json({ message: 'User profile pic updated successfully' });
+        } else {
+            console.log('No rows affected. Profile pic update failed.');
+            res.status(400).json({ error: 'Profile pic update failed' });
+        } 
+    } catch (error) {
+        console.error('Error updating profile pic:', error);
+        res.status(500).json({ error: 'Internal Server Error' });       
+    }
+};
+
+//sending file to folder  
+// const storageEngine = multer.diskStorage({
+//     destination:'./pol',
+//     filename:(req,files,cb)=>{
+//         cb(null,files.originalname + '-' + Date.now())
+//     }
+
+// })
+// export const uploads = multer({storage:storageEngine});
+// //init upload
+// export const upload = multer({
+//     storage: storage,
+//     limits: { fileSize: 1000000000 },
+//     fileFilter: function (req, files, cb) {
+//         checkFileType(files, cb);
+//     }
+// }).array('profilePic');
+
+
+// export const uploadProfilePic1 = async (req: Request, res: Response) => {
+//     try {
+//         if(!req.files){
+//             console.log('no file uploaded');
+            
+//             return res.status(400).json({ error: 'No file uploaded' });
+//         }
+//         console.log('File Object:', req.files);
+//         return res.status(200).json({ message: 'pic upload in progress' });
+//     } catch (error) {
+//         console.error('Error updating profile pic:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+        
+//     }
+// }
+
+
+

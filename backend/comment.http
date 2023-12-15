@@ -1,0 +1,57 @@
+### comment on post 
+post http://localhost:5800/comment/commentOnPost
+Content-Type: application/json
+
+{
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "postID": "9a200abb-9413-435b-953a-27dd45f17dad" ,
+    "content": "like comment on post",
+    "userName": "dogo"
+}
+
+### get all comments on post
+get http://localhost:5800/comment/getPostComments
+Content-Type: application/json
+
+{
+    "postID": "9a200abb-9413-435b-953a-27dd45f17dad"
+}
+
+### comment on comment
+post http://localhost:5800/comment/commentOnComment
+Content-Type: application/json
+
+{
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "postID": "9a200abb-9413-435b-953a-27dd45f17dad" ,
+    "parentCommentID": "7e7bc79a-2dbc-439b-8d1d-66821798bea8" ,
+    "content": "C02 is death",
+    "userName": "dogo"
+}
+
+### get all comments on comment
+get http://localhost:5800/comment/getCommentsOnComment
+Content-Type: application/json
+
+{
+    "commentID": "7e7bc79a-2dbc-439b-8d1d-66821798bea8"
+}
+
+### update comment
+put http://localhost:5800/comment/updateComment
+Content-Type: application/json
+
+{
+    "commentID": "8c7ff016-695b-4322-ae2c-306fbe20e310",
+    "updatedContent": "sorry C02 gives plant life",
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+}
+
+### delete comment
+delete http://localhost:5800/comment/deleteComment
+Content-Type: application/json
+
+{
+    "commentID": "7e7bc79a-2dbc-439b-8d1d-66821798bea8",
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+}

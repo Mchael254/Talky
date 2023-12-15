@@ -8,41 +8,27 @@ import * as fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import { join } from 'path';
 import { v4 } from "uuid";
-import { profileUpdateValidationSchema, userLoginValidationSchema, userRegisterValidationSchema } from "../validators/userValidators";
+import { passwordResetRequestValidationSchema, passwordResetValidationSchema, profileUpdateValidationSchema, userLoginValidationSchema, userRegisterValidationSchema } from "../validators/userValidators";
 import { sqlConfig } from "../config/sqlConfig";
 import { ExtendedUser } from "../middleware/tokenVerify.ts";
+import dotenv from 'dotenv';
+const cloudinary = require('cloudinary').v2;
+
+
+//cloudinary
+dotenv.config();
+cloudinary.config({
+    cloud_name: process.env.cloud_name,
+    api_key: process.env.api_key,
+    api_secret: process.env.api_secret
+});
 
 //storage engine
-const storage = multer.memoryStorage();
-// // Set storage engine
-// const storage = multer.diskStorage({
-//     destination: './public/uploads/',
-//     filename: function(req, file, cb){
-//         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-//     }
-// });
-
-
-//init upload
-export const upload = multer({
-    storage: storage,
-    limits: { fileSize: 1000000000 },
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb);
-    }
-}).single('profilePic');
-
-
-
-
+export const storage = multer.memoryStorage();
 //check file type
-//check file type
-function checkFileType(file: any, cb: any) {
-    //allowed ext
-    const fileTypes = /jpeg|jpg|png|gif/;
-    //check ext
+export function checkFileType(file: any, cb: any) {
+    const fileTypes = /jpeg|jpg|png|gif|jfif/;
     const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    //check mime
     const mimetype = fileTypes.test(file.mimetype);
 
     if (mimetype && extname) {
@@ -52,61 +38,54 @@ function checkFileType(file: any, cb: any) {
     }
 }
 
-export const uploadProfilePic = async (req: Request, res: Response) => {
-    try {
-        
-        const userID = req.body.userID;
-        console.log(userID);
+//init upload
+export const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1000000000 },
+    fileFilter: function (req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single('imagePath');
 
-        
-        if (!req.file) {
+
+
+//upload profile pic
+export const uploadProfilePic1 = async (req: Request, res: Response) => {
+    try {
+        if(!req.file){
+            console.log('no file uploaded');    
             return res.status(400).json({ error: 'No file uploaded' });
         }
-        if (!req.file.mimetype.startsWith('image/')) {
-            return res.status(400).json({ error: 'Uploaded file is not an image' });
-        }
-        
+        const email = req.body.email;
         const pool = await mssql.connect(sqlConfig);
         const updateQuery = `
             UPDATE Users
-            SET profilePic = @profilePic
-            WHERE userID = @UserID
+            SET imagePath = @imageUrl
+            WHERE email = @email
         `;
-        const request = pool.request();
-        request.input('UserID', mssql.VarChar, userID);
+        const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`);
+        const imageUrl = result.secure_url;
+        console.log(imageUrl);
         
-        const file = req.file;
-        console.log('File Object:', file);
-        console.log('File Buffer:', file.buffer);
+        const request = pool.request();
+        request.input('email', mssql.VarChar, email);
+        request.input('imageUrl', mssql.VarChar, imageUrl);
+        const results = await request.query(updateQuery);
+        return res.status(200).json({ message: 'pic upload in progress',
+        
+                                    success: true,
+                                     imageUrl:imageUrl
+                                    });
 
-        console.log('File Type:', file.mimetype);
-        console.log('File Extension:', path.extname(file.originalname));
-        console.log('File MIME Type:', file.mimetype);
-
-         // 
-        request.input('profilePic', mssql.VarBinary, file.buffer);
-
-        const result = await request.query(updateQuery);
-        const rowsAffected = result.rowsAffected[0];
-
-        if (rowsAffected > 0) {
-            console.log('User profile pic updated successfully:', result);
-            res.status(200).json({ message: 'User profile pic updated successfully' });
-        } else {
-            console.log('No rows affected. Profile pic update failed.');
-            res.status(400).json({ error: 'Profile pic update failed' });
-        } 
     } catch (error) {
         console.error('Error updating profile pic:', error);
         res.status(500).json({ error: 'Internal Server Error' });
         
     }
- 
-  };
+}
 
 
-
-//register user
+    //register user
 export const registerUser = async (req: Request, res: Response) => {
     try {
         let { userName, email, password } = req.body;
@@ -268,7 +247,7 @@ export const followUser = async (req: Request, res: Response) => {
     }
 }
 
-// //update user profile
+//update user profile
 export const updateProfile = async (req: Request, res: Response) => {
 
     try {
@@ -303,54 +282,111 @@ export const updateProfile = async (req: Request, res: Response) => {
     }
 };
 
-// //upload profile picture based on user id
+
+//initiate password reset
+export const initiate_password_reset = async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      const { error } = passwordResetRequestValidationSchema.validate(req.body);
+  
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+  
+      const resetToken = generateRandomToken();
+      const expiryTime = calculateExpiryTime();
+  
+      const pool = await mssql.connect(sqlConfig);
+  
+      const resetResult = await pool
+        .request()
+        .input('email', mssql.VarChar, email)
+        .input('resetToken', mssql.VarChar, resetToken)
+        .input('expiryTime', mssql.Numeric, expiryTime)
+        .execute('initiate_password_reset');
+  
+      if (resetResult.recordset && resetResult.recordset.length > 0) {
+        const message = resetResult.recordset[0].message;
+        if (message === 'Password reset initiated') {
+          return res.status(200).json({ message: `password reset initiated check ${email} for more details` });
+        } else {
+          return res.status(400).json({ message: 'email not found.' });
+        }
+      } else {
+        return res.status(500).json({
+          message: 'Error initiating password reset',
+        });
+      }
+    } catch (error: any) {
+      console.error('Error with the password reset', error);
+      return res.status(500).json({
+        message: 'Internal Server Error',
+        error: error.message,
+      });
+    }
+  };
+  
+  const generateRandomToken = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  };
+  
+  const calculateExpiryTime = () => {
+    return Math.floor(Date.now() / 1000) + 3600;
+  };
+  
+  
+  //reset password
+  export const resetPassword = async (req: Request, res: Response) => {
+    try {
+      const { email, newPassword, token } = req.body;
+  
+      const { error } = passwordResetValidationSchema.validate(req.body);
+  
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+  
+      const hashedPwd = await bcrypt.hash(newPassword, 5);
+  
+      const pool = await mssql.connect(sqlConfig);
+  
+      const resetResult = await pool
+        .request()
+        .input('email', mssql.VarChar, email)
+        .input('newPassword', mssql.VarChar, hashedPwd)
+        .input('token', mssql.VarChar, token)
+        .execute('updatePassword');
+  
+      if (resetResult.recordset && resetResult.recordset.length > 0) {
+        const message = resetResult.recordset[0].message;
+  
+        if (message === 'Password updated successfully') {
+          return res.status(200).json({ message: 'Password reset successful' });
+        } else if (message === 'Invalid token') {
+          return res.status(400).json({ message: 'Invalid reset token' });
+        } else if (message === 'Invalid email') {
+          return res.status(400).json({ message: 'Invalid email' });
+        } else {
+          return res.status(500).json({
+            message: 'Error resetting password',
+          });
+        }
+      } else {
+        return res.status(500).json({
+          message: 'Error resetting password',
+        });
+      }
+    } catch (error: any) {
+      console.error('Error with the password reset', error);
+      return res.status(500).json({
+        message: 'Internal Server Error',
+        error: error.message,
+      });
+    }
+  };
 
 
 
-// export const uploadProfilePic = (req: Request, res: Response) => {
-//     upload(req, res, async (err) => {
-//         if (err) {
-//             res.status(400).json({ message: err });
-//         } else {
-//             try {
-//                 let userID = req.body.userID
-//                 // console.log(userID);
-                
-//                 if (!userID) {
-//                     return res.status(400).json({ message: 'User ID not provided!' });
-//                 }
-
-//                 if (req.file === undefined) {
-//                     return res.status(400).json({ message: 'No file selected!' });
-//                 }
-
-//                 const filePath = `uploads/${req.file.filename}`;
-
-//                 // Update the user record with the file path
-//                 const pool = await mssql.connect(sqlConfig);
-//                 const updateQuery = 'UPDATE Users SET profilePic = @filePath WHERE userID = @userID';
-
-//                 const result = await pool
-//                     .request()
-//                     .input('filePath', filePath)
-//                     .input('userID', userID)
-//                     .query(updateQuery);
-               
-//                     console.log(result);
-                    
-//                 if (result.rowsAffected[0] > 0) {
-//                     res.status(200).json({ message: 'Profile updated successfully', filePath });
-//                 } else {
-//                     res.status(400).json({ error: 'Failed to update profile' });
-//                 }
-
-//             } catch (error) {
-//                 console.error('Error uploading profile picture:', error);
-//                 res.status(500).json({ message: 'Internal Server Error' });
-//             }
-//         }
-//     });
-// };
 
 
 
@@ -360,22 +396,6 @@ export const updateProfile = async (req: Request, res: Response) => {
 
 
 
-// export const uploadProfilePic = (req: Request, res: Response) => {
-//     upload(req, res, (err) => {
-//         if(err){
-//             res.status(400).json({ message: err });
-//         } else {
-//             if(req.file == undefined){
-//                 res.status(400).json({ message: 'No file selected!' });
-//             } else {
-//                 res.json({
-//                     message: 'File uploaded successfully!',
-//                     file: `uploads/${req.file.filename}`
-//                 });
-//             }
-//         }
-//     });
-// };
 
 
 
@@ -383,25 +403,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
   
 
-//   upload(req, res, (err) => {
-//     if (err) {
-//       res.status(400).json({ message: err });
-//     } else {
-//       if (req.file == undefined) {
-//         res.status(400).json({ message: 'No file selected!' });
-//       } else {
-       
-//         const imagePath = `uploads/${req.file.filename}`;
-//         const userID = req.body.userID; 
 
-//         res.json({
-//           message: 'File uploaded successfully!',
-//           file: imagePath
-//         });
-//       }
-//     }
-//   });
-  
 
 
 

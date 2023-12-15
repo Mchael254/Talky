@@ -1,0 +1,36 @@
+
+### add follow
+post http://localhost:5800/follow/addFollow
+Content-Type: application/json
+
+{
+    "followerID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "followeeID": "30b8726a-f623-4920-a0da-c77d183bbdca" 
+}
+
+### get followers
+get  http://localhost:5800/follow/getFollowers
+Content-Type: application/json
+
+{
+    "userID": "4d087c21-1cc8-48cc-b792-7045b93090bb"
+    
+}
+
+### get following
+get  http://localhost:5800/follow/getFollowing
+Content-Type: application/json
+
+{
+    "userID": "4d087c21-1cc8-48cc-b792-7045b93090bb"
+    
+}
+
+### unfollow user
+post http://localhost:5800/follow/unfollow
+Content-Type: application/json
+
+{
+    "followerID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "followeeID": "30b8726a-f623-4920-a0da-c77d183bbdca" 
+}

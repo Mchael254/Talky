@@ -4,9 +4,11 @@ Content-Type: application/json
 
 {
 
-    "userName": "test",
-    "email": "jame@gmail.com",
-    "password": "123456"
+    "userName": "mike",
+    "email": "mikevenum9@gmail.com",
+    "password": "Mike123.100#"
+
+    
 }
 
 ### login user
@@ -58,5 +60,28 @@ Content-Type: multipart/form-data
 
 }
 
-### get student details
-get  http://localhost:5800/user/student
+
+### request password reset
+post http://localhost:5800/user/requestPasswordReset
+Content-Type: application/json
+
+{
+    
+    "email":"mikevenum9@gmail.com"
+}
+
+
+
+### update password
+
+post http://localhost:5800/user/resetPassword
+Content-Type: application/json
+
+{
+    
+    "email":"mikevenum9@gmail.com",
+    "newPassword":"Mike123.100%",
+    "token":"bkq8z8h3hd6v092fyp4mzc"
+   
+}
+

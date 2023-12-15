@@ -1,0 +1,29 @@
+### create post
+post http://localhost:5800/post/createPost
+Content-Type: application/json
+
+{
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "postPic": "nice pics",
+    "content": "good morning Europe"
+}
+
+### get user posts
+get http://localhost:5800/post/getUserPosts
+Content-Type: application/json
+
+{
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+}
+
+### get all posts
+get http://localhost:5800/post/
+
+
+### delete post
+delete http://localhost:5800/post/deletePost
+Content-Type: application/json
+
+{
+    "postID": "9a200abb-9413-435b-953a-27dd45f17dad"
+}

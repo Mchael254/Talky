@@ -1,0 +1,38 @@
+### like comment
+post http://localhost:5800/likes/likeComment
+Content-Type: application/json
+
+{
+    "commentID": "4713a02a-6c21-46bc-ad04-0284bcebf01d",
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+}
+
+
+### unlike comment
+post http://localhost:5800/likes/unlikeComment
+Content-Type: application/json
+
+{
+    "commentID": "4713a02a-6c21-46bc-ad04-0284bcebf01d",
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+}
+
+### like post
+post http://localhost:5800/likes/likePost
+Content-Type: application/json
+
+{
+    "postID": "362a4897-4288-42ef-b82e-08b5b2e05a8d",
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
+    "userName": "dogo"
+}
+
+### unlike post
+post http://localhost:5800/likes/unlikePost
+Content-Type: application/json
+
+{
+    "postID": "362a4897-4288-42ef-b82e-08b5b2e05a8d",
+    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455"
+    
+}

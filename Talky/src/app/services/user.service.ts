@@ -10,27 +10,33 @@ export class UserService {
 
   private apiUrl = 'http://localhost:5800/user';
   private photoUrl = 'http://localhost:5800/user/uploadProfilePic';
+  private postUrl = 'http://localhost:5800/post';
 
   constructor(private http: HttpClient, private router: Router) { }
 
   //fetch all users
-  fetchAllUsers():Observable<any[]>{
+  fetchAllUsers(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl)
   }
 
   //follow user
-  followUser(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/followUser`, data);
+  followUser(followData: any): Observable<any> {
+    return this.http.post(`${this.postUrl}/addFollow`, followData);
   }
 
-   //update profile
-   updateProfile(profileDataUpdate: any): Observable<any> {
+  //update profile
+  updateProfile(profileDataUpdate: any): Observable<any> {
     const updateProfileUrl = `${this.apiUrl}/updateProfile`;
 
     return this.http.put(updateProfileUrl, profileDataUpdate);
   }
   uploadProfilePic(formData: FormData, options?: any): Observable<any> {
     return this.http.post(this.photoUrl, formData, options);
+  }
+
+  //get followers
+  getFollowers(userID: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.postUrl}/getFollowers/${userID}`);
   }
 
 

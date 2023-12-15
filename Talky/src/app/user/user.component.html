@@ -27,7 +27,7 @@
           expand_circle_up
         </span>More</button>
     </div>
-    <!-- <div *ngIf="moreModal" class="moreModal"></div> -->
+
     <div *ngIf="moret" class="more">
       <div class="parts">
         <button (click)="logout()"><span style="border: solid 0px;" class="material-symbols-outlined">
@@ -40,7 +40,6 @@
           </span>Profile</button>
       </div>
     </div>
-
 
     <div class="post">
       <button (click)="POST()">Post</button>
@@ -69,7 +68,6 @@
     </div>
   </div>
 
-
   <!-- profiles and feeds -->
   <div class="functions">
     <!-- user and other's profiles -->
@@ -77,18 +75,21 @@
     <div *ngIf="profile" class="profileManage">
       <div *ngIf="mine" class="profileBar">
         <div class="profilePhoto" (click)="openProfile()">
-          <img *ngIf="matchingUser && matchingUser.profilePic" [src]="getImageDataUrl(matchingUser)"
-            alt="Profile Picture">
+          <!-- <img *ngIf="matchingUser && matchingUser.imagePath" [src]="getImageDataUrl(matchingUser)" -->
+          <!-- alt="Profile Picture"> -->
+          <img [src]="matchingUserDp">
+          <ng-template #defaultImage>
+            <img [src]="'../../assets/talk.png'" alt="Default Image">
+          </ng-template>
         </div>
         <div *ngIf="changeModal" class="changeModal">
           <button>Remove</button>
           <button (click)="openFileInput()">Update</button>
           <button (click)="closePic()">Cancel</button>
-
         </div>
         <div class="galleryPos" style="height: 15px;">
           <div class="phot">
-            <input type="file" id="fileInput" (change)="previewImage($event)">
+            <input type="file" name="profilePic" id="fileInput" (change)="onImageSelected($event)">
           </div>
         </div>
         <div *ngIf="modalProfileUpdate" class="modalProfileUpdate">
@@ -98,7 +99,7 @@
           </div>
           <div class="picUpdate" style="position: relative;">
             <img *ngIf="imagePreview" [src]="imagePreview" alt="Image Preview" id="imagePreview2">
-            <button style="position: absolute;bottom: 7px;right: 5px;border-radius: 50%;
+            <button (click)="updateDp()" style="position: absolute;bottom: 7px;right: 5px;border-radius: 50%;
             background-color: #0094f5;height: 7vh;width: 3vw;display: flex;justify-content: baseline;align-items: center;
             cursor: pointer;font-size: 14px;color: #fff;">Update</button>
           </div>
@@ -108,8 +109,8 @@
           <h1>{{profileName}}</h1>
           <div class="numbers">
             <div class="follow">
-              <p>Followers 1200</p>
-              <p>Following 1.5k</p>
+              <p>{{ matchingUserFollowCount}} Followers</p>
+              <p>{{ matchingUserFollowingCount}} Following</p>
             </div>
             <button *ngIf="edits" (click)="edit()">Edit Profile</button>
           </div>
@@ -120,15 +121,20 @@
       <!-- otherUser profile -->
       <div *ngIf="specificUser" class="profileBar">
         <div class="profilePhoto">
-          <img *ngIf="otherUser.profilePic" [src]="getImageDataUrl(otherUser)" alt="Profile Picture">
+          <!-- <img *ngIf="otherUser.profilePic" [src]="getImageDataUrl(otherUser)" alt="Profile Picture"> -->
+          <img *ngIf="otherUser.imagePath; else defaultImage" [src]="otherUser.imagePath" alt="user image">
+          <ng-template #defaultImage>
+            <img [src]="'../../assets/talk.png'" alt="Default Image">
+          </ng-template>
+
         </div>
         <div class="userDetails">
           <h1>{{otherName}}</h1>
           <p style="display: none;">{{otherID}}</p>
           <div class="numbers">
             <div class="follow">
-              <p><span style="font-weight: bold;">Followers 20 </span>{{otherFollowers}}</p>
-              <p><span style="font-weight: bold;">Following 1200</span>{{otherFollowing}}</p>
+              <p><span style="font-weight: bold;"> {{otherFollowCount}}</span>Followers </p>
+              <p><span style="font-weight: bold;"> {{otherFollowingCount}} </span>Following</p>
             </div>
             <button *ngIf="folUser" (click)="followUser(otherID)" [class.active]="isFollow">Follow</button>
             <button *ngIf="unfolUser" (click)="unfollowUser()" [class.active]="isUnfollow">Unfollow</button>
@@ -136,8 +142,72 @@
         </div>
       </div>
 
-      <!-- profile contents -->
-      <div class="content">
+      <!-- personal profile contents -->
+      <div *ngIf="personalContent" class="content">
+        <div class="bar">
+          <div class="barParts">
+            <div class="line" *ngIf="linep"></div>
+            <button (click)="posts()">Post</button>
+          </div>
+          <div class="barParts">
+            <div class="line" *ngIf="linem"></div>
+            <button (click)="media()">Media</button>
+          </div>
+          <div class="barParts">
+            <div class="line" *ngIf="linef"></div>
+            <button (click)="getFollowers()">Followers</button>
+          </div>
+          <div class="barParts">
+            <div class="line" *ngIf="linel"></div>
+            <button (click)="following()">Following </button>
+          </div>
+        </div>
+
+        <div *ngIf="general" class="general">
+          <div *ngIf="folowers" class="follower">
+            <div *ngFor="let follower of followerss" class="follower">
+              <img [src]="follower.imagePath" alt="">
+              <p style="font-weight: bold;">{{follower.userName}}</p>
+              <button>View</button>
+            </div>
+          </div>
+
+          <div *ngIf="folowing" class="follower">
+            <img src="{{image}}" alt="">
+            <p style="font-weight: bold;">useName </p>
+            <button>Follow</button>
+            <button>View</button>
+          </div>
+        </div>
+
+        <div *ngIf="post" class="postsC">
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+          <div class="postCard">
+            <p>Post</p>
+            <img src="{{image}}" alt="">
+          </div>
+        </div>
+
+        <div *ngIf="medias" class="postsC">
+          <div class="postCard">
+            <img src="{{image}}" alt="">
+          </div>
+        </div>
+      </div>
+
+      <!-- other profile contents -->
+      <div *ngIf="otherContent" class="content">
         <div class="bar">
           <div class="barParts">
             <div class="line" *ngIf="linep"></div>
@@ -200,9 +270,10 @@
       </div>
     </div>
 
+    <!-- default feeds -->
     <div *ngIf="feeds" class="feeds">
       <div class="foll">
-        <button  (click)="seeMore()" class="seeMore">Options</button>
+        <button (click)="seeMore()" class="seeMore">Options</button>
         <button (click)="yourFollower()">Following</button>
         <button (click)="yourFollowin()">For you </button>
       </div>
@@ -255,12 +326,10 @@
             </div>
           </div>
         </div>
-
-
       </div>
-
-
     </div>
+
+    <!-- specified feeds -->
     <div *ngIf="feeds1" class="feeds">
       <div class="foll">
         <button>Following</button>
@@ -316,13 +385,9 @@
           </div>
         </div>
 
-
       </div>
 
-
     </div>
-
-
 
   </div>
   <div class="others">
@@ -373,9 +438,11 @@
       <p *ngIf="line" class="line"></p>
       <div *ngIf="filteredUsers" class="suggested">
         <div *ngFor="let user of filteredUsers" class="suggestions">
-          <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture">
+          <img *ngIf="user.imagePath; else defaultImage" [src]="user.imagePath" alt="User Image">
+          <ng-template #defaultImage>
+            <img [src]="'../../assets/talk.png'" alt="Default Image">
+          </ng-template>
           <p style="font-weight: bold;">{{user.userName}}</p>
-
           <p style="display: none;">{{user.userID}}</p>
           <button (click)="viewSpecificUser(user)">View</button>
         </div>

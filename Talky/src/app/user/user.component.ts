@@ -5,22 +5,19 @@ import { UserService } from '../services/user.service';
 import { filter } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
+import { AdminService } from '../services/admin.service';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.css'],
-
-
 })
 export class UserComponent {
-
-
-
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(private userService: UserService, private router: Router, private adminService: AdminService) { }
   ngOnInit() {
     this.fetchAllUsers();
     this.fetchProfile();
+
   }
 
   //profile management
@@ -50,7 +47,6 @@ export class UserComponent {
     localStorage.clear();
     this.router.navigate(['/signin'])
   }
-
 
   //update profile details
   userDetail: any = {};
@@ -190,8 +186,6 @@ export class UserComponent {
     }
   }
 
-
-
   //post form
   modal: boolean = false;
   postss: boolean = false;
@@ -237,7 +231,7 @@ export class UserComponent {
   }
   seeMores: boolean = false;
   seeMore() {
-    
+
   }
 
   //profile
@@ -249,6 +243,8 @@ export class UserComponent {
     this.feeds1 = false;
     this.specificUser = false;
     this.mine = true;
+    this.personalContent = true;
+    this.otherContent = false;
   }
 
   setLineStatus(m: boolean, f: boolean, p: boolean, l: boolean): void {
@@ -272,6 +268,7 @@ export class UserComponent {
     this.setLineStatus(false, true, false, false);
     this.setContentStatus(false, false, true, false);
     this.general = true;
+    this.folowers = false;
   }
 
   //following
@@ -293,7 +290,7 @@ export class UserComponent {
   }
 
   //post
-  post: boolean = true;
+  post: boolean = false;
   posts() {
     this.setLineStatus(false, false, true, false);
     this.setContentStatus(true, false, false, false);
@@ -306,6 +303,8 @@ export class UserComponent {
   otherFollowers: number = 0;
   otherFollowing: number = 0;
   otherID: string = '';
+  otherFollowCount: number = 0;
+  otherFollowingCount: number = 0;
 
   viewSpecificUser(user: any) {
     this.specificUser = true;
@@ -313,10 +312,12 @@ export class UserComponent {
     this.feeds = false;
     this.profile = true;
     this.otherName = user.userName;
-    this.otherFollowers = user.followers;
-    this.otherFollowing = user.following;
+    this.otherFollowCount = user.followCount;
+    this.otherFollowingCount = user.followingCount;
     this.otherID = user.userID
     this.otherUser = user;
+    this.personalContent = false;
+    this.otherContent = true;
   }
 
   //get all users
@@ -336,12 +337,18 @@ export class UserComponent {
   }
   showFileInput = false;
   matchingUser: any;
+  matchingUserDp: any;
+  matchingUserFollowCount: number = 0;
+  matchingUserFollowingCount: number = 0;
   compareAndRetrieveDetails() {
     const localStorageEmail = this.userDetail.email;
     this.matchingUser = this.allUsers.find((user: any) => user.email === localStorageEmail);
     if (this.matchingUser) {
       const matchingUserName = this.matchingUser.userName;
-      const matchingUserID = this.matchingUser.userID;;
+      const matchingUserID = this.matchingUser.userID;
+      this.matchingUserDp = this.matchingUser.imagePath
+      this.matchingUserFollowCount = this.matchingUser.followCount;
+      this.matchingUserFollowingCount = this.matchingUser.followingCount;
     } else {
       console.log("No matching user found.");
     }
@@ -363,19 +370,80 @@ export class UserComponent {
       fileInput.click();
     }
   }
+
+  selectedImage: File | null = null;
+  onImageSelected(event: any): void {
+    this.previewImage(event);
+    const fileList: FileList | null = event.target.files;
+    if (fileList && fileList.length > 0) {
+      this.selectedImage = fileList[0];
+    }
+  }
+
+  userEmails: any;
+  updateDp() {
+    this.userEmails = localStorage.getItem('user_email');
+    const email = this.userEmails
+    console.log(this.email);
+
+    if (!this.selectedImage) {
+      console.log('Please select an image to upload');
+      return;
+    }
+    console.log(this.selectedImage);
+    const formData = new FormData();
+    formData.append('profilePic', this.selectedImage);
+    formData.append('email', this.email);
+    console.log(formData);
+    this.adminService.uploadImage(formData).subscribe(
+      (response) => {
+        this.modalProfileUpdate = false;
+        this.compareAndRetrieveDetails();
+        console.log(response);
+        this.changeModal = false;
+        // this.meso = response.message;
+      },
+      (error) => {
+        console.log(error);
+        // this.meso = error.error.message;
+      }
+    )
+
+  }
+
   closePic2() {
     this.modalProfileUpdate = false;
   }
 
   //filtering
+  // filterUsers() {
+  //   setTimeout(() => {
+  //     this.filteredUsers = this.allUsers.filter((user: any) => {
+  //       return user.userName && user.userName.toLowerCase().includes(this.searchTearm.toLowerCase());
+  //     })
+  //   }, 4000);
+
+  // }
+
+  // Filtering
   filterUsers() {
     setTimeout(() => {
-      this.filteredUsers = this.allUsers.filter((user: any) => {
-        return user.userName && user.userName.toLowerCase().includes(this.searchTearm.toLowerCase());
-      })
-    }, 4000);
+      const userEmailToExclude = localStorage.getItem('user_email');
 
+      if (userEmailToExclude) {
+        this.filteredUsers = this.allUsers.filter((user: any) => {
+          return user.userName &&
+            user.userName.toLowerCase().includes(this.searchTearm.toLowerCase()) &&
+            user.email !== userEmailToExclude;
+        });
+      } else {
+        this.filteredUsers = this.allUsers.filter((user: any) => {
+          return user.userName && user.userName.toLowerCase().includes(this.searchTearm.toLowerCase());
+        });
+      }
+    }, 4000);
   }
+
 
   //image
   bufferToBase64(buffer: Buffer) {
@@ -396,39 +464,68 @@ export class UserComponent {
   }
 
   //follow user
-  folUser:boolean = true;
-  unfolUser:boolean = false;
+  folUser: boolean = true;
+  unfolUser: boolean = false;
   ID: string = ''
   userDetails: any[] = []
   isFollow: boolean = false;
   isUnfollow: boolean = false;
+  followerID: string = '';
   followUser(otherID: any) {
     this.unfolUser = true;
     this.folUser = false;
     this.isFollow = true;
     this.isUnfollow = true;
-    // this.userDetails = JSON.parse(localStorage.getItem('details')||'[]')
-    // console.log(this.userDetails);
+    this.followerID = this.matchingUser.userID;
 
     const followData = {
-      userFollowedID: otherID,
-
+      followeeID: otherID,
+      followerID: this.followerID
     }
     console.log(followData);
-
     // this.userService.followUser(followData)
-
+    this.userService.followUser(followData).subscribe(
+      (response) => {
+        console.log('Followed successfully:', response);
+        this.fetchAllUsers();
+        this.fetchProfile();
+      },
+      (error) => {
+        console.error('Error following user:', error);
+      }
+    );
   }
+
+  followerss: any[] = [];
+  getFollowers() {
+    const userID = this.matchingUser.userID;
+    console.log(userID);
+    this.userService.getFollowers(userID).subscribe(
+      (response) => {
+        console.log('Followers:', response);
+        this.followerss = response;
+        this.folowers = true
+      },
+      (error) => {
+        console.error('Error getting followers:', error);
+      }
+    );
+  }
+
   unfollowUser() {
     this.unfolUser = false;
     this.folUser = true;
     this.isFollow = false;
   }
 
+  personalContent: boolean = true;
+  otherContent: boolean = false;
+
+
 
   //feeds functions
   //like
-  postq:string = 'I remember sometimes back when road bikes were hard to purchase, I mean they used to cost a fortune. All I can you guys today are enjoying it. Anyway, enjoy your rides';
+  postq: string = 'I remember sometimes back when road bikes were hard to purchase, I mean they used to cost a fortune. All I can you guys today are enjoying it. Anyway, enjoy your rides';
   isFavorite = false;
   favoriteCount = 0;
 
@@ -439,21 +536,21 @@ export class UserComponent {
   //comment
   textPost2: string = '';
   postss1: boolean = false;
-  comment(){
+  comment() {
     this.modal = true;
     this.postss1 = true;
   }
 
   //feeds
-  yourFollowers:boolean = false;
-  feeds1:boolean = false;
-  image1:string = "../../assets/foot.jpeg";
+  yourFollowers: boolean = false;
+  feeds1: boolean = false;
+  image1: string = "../../assets/foot.jpeg";
 
 
-  yourFollower(){
+  yourFollower() {
 
   }
-  yourFollowin(){
+  yourFollowin() {
     this.feeds1 = true;
     this.feeds = false;
 

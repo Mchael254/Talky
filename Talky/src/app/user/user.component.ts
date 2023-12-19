@@ -133,41 +133,6 @@ export class UserComponent {
     );
   }
 
-  //upload profile pic
-
-//use multer
-  // sendImage(): void {
-  //   const userID = this.updateID;
-  //   const profilePic = this.imagePreview;
-
-  //   if (profilePic) {
-  //     // Convert base64 to Blob
-  //     const base64Image = profilePic as string;
-  //     const byteCharacters = atob(base64Image.split(',')[1]);
-  //     const byteNumbers = new Array(byteCharacters.length);
-  //     for (let i = 0; i < byteCharacters.length; i++) {
-  //       byteNumbers[i] = byteCharacters.charCodeAt(i);
-  //     }
-  //     const byteArray = new Uint8Array(byteNumbers);
-  //     const blob = new Blob([byteArray], { type: 'image/png' });
-
-  //     const formData = new FormData();
-  //     formData.append('userID', userID.toString());
-  //     formData.append('profilePic', blob);
-
-  //     this.userService.uploadProfilePic(formData).subscribe(
-  //       (response) => {
-  //         console.log('Profile pic uploaded successfully:', response);
-  //       },
-  //       (error) => {
-  //         console.error('Error uploading profile pic:', error);
-  //       }
-  //     );
-  //   } else {
-  //     console.error('Profile pic is null or invalid.');
-  //   }
-  // }
-
   //post form
   modal: boolean = false;
   postss: boolean = false;
@@ -236,7 +201,9 @@ export class UserComponent {
       console.log('Please select an image to upload');
       this.userService.createPost(postData).subscribe(
         (response) => {
-          console.log(response);
+          this.modal = false;
+          this.postss = false;
+          this.getAllPosts();
         },
         (error) => {
           console.log(error);
@@ -247,8 +214,9 @@ export class UserComponent {
     console.log(postData);
     this.userService.createPost(postData).subscribe(
       (response) => {
-        this.compareAndRetrieveDetails();
-        console.log(response);
+        this.getAllPosts();
+        this.modal = false;
+        this.postss = false;
       },
       (error) => {
         console.log(error);
@@ -264,6 +232,9 @@ export class UserComponent {
   viewHome() {
     this.profile = false;
     this.feeds = true;
+    this.feeds1 = false;
+    this.commentFeeds = false;
+    this.commentOnCommentFeeds = false;
   }
   exit() {
     this.router.navigate(['/landing'])
@@ -287,10 +258,13 @@ export class UserComponent {
   //profile
   profileView() {
     // this.moreModal = false;
+    this.getUserPosts();
     this.more = false;
     this.profile = true;
     this.feeds = false;
     this.feeds1 = false;
+    this.commentFeeds = false;
+    this.commentOnCommentFeeds = false;
     this.specificUser = false;
     this.mine = true;
     this.personalContent = true;
@@ -302,9 +276,6 @@ export class UserComponent {
   linem: boolean = false;
   linefl: boolean = false;
   linel: boolean = false;
-
-  gFollowing: boolean = false;
-
 
   generalFollower: boolean = false;
   magic: boolean = false;
@@ -347,7 +318,35 @@ export class UserComponent {
       }
     );
   }
-  //get user posts
+  //get user post
+  confirmDelete() {
+    this.deleteID
+    console.log(this.deleteID);
+    this.userService.deletePost(this.deleteID).subscribe(
+      (response) => {
+        console.log(response);
+        this.changeModalUserPosts = false
+        this.getUserPosts();
+      },
+      (error) => {
+        console.error('Error deleting post:', error);
+      }
+    );
+
+
+  }
+  changeModalUserPosts: boolean = false;
+  deleteID: string = '';
+  deletePost(postID: any) {
+    console.log(postID);
+    this.deleteID = postID;
+    this.changeModalUserPosts = true
+
+  }
+  CancelDelete() {
+    this.changeModalUserPosts = false
+
+  }
   userPostss: any[] = [];
   userPosts: boolean = true;
   time: string = '';
@@ -439,19 +438,6 @@ export class UserComponent {
   otherFollowCount: number = 0;
   otherFollowingCount: number = 0;
 
-  viewSpecificUser(user: any) {
-    this.specificUser = true;
-    this.mine = false;
-    this.feeds = false;
-    this.profile = true;
-    this.otherName = user.userName;
-    this.otherFollowCount = user.followCount;
-    this.otherFollowingCount = user.followingCount;
-    this.otherID = user.userID
-    this.otherUser = user;
-    this.personalContent = false;
-    this.otherContent = true;
-  }
 
   //get all users
   searchTearm: string = '';
@@ -548,16 +534,6 @@ export class UserComponent {
     this.modalProfileUpdate = false;
   }
 
-  //filtering
-  // filterUsers() {
-  //   setTimeout(() => {
-  //     this.filteredUsers = this.allUsers.filter((user: any) => {
-  //       return user.userName && user.userName.toLowerCase().includes(this.searchTearm.toLowerCase());
-  //     })
-  //   }, 4000);
-
-  // }
-
   // Filtering
   filterUsers() {
     setTimeout(() => {
@@ -596,68 +572,421 @@ export class UserComponent {
     return null;
   }
 
-  //follow user
-  folUser: boolean = true;
+  //follow and unFollow user
+  viewSpecificUser(user: any) {
+    this.specificUser = true;
+    this.mine = false;
+    this.feeds = false;
+    this.feeds1 = false;
+    this.commentFeeds = false;
+    this.commentOnCommentFeeds = false;
+    this.profile = true;
+    this.otherName = user.userName;
+    this.otherFollowCount = user.followCount;
+    this.otherFollowingCount = user.followingCount;
+    this.otherID = user.userID
+    this.otherUser = user;
+    this.personalContent = false;
+    this.otherContent = true;
+
+    const storedUserIDsString = localStorage.getItem('followedUserIDs');
+    if (storedUserIDsString) {
+      const storedUserIDs: string[] = JSON.parse(storedUserIDsString);
+
+      if (storedUserIDs.includes(this.otherID)) {
+        console.log('Yes, this.otherID exists in localStorage.');
+        this.unfolUser = true; this.folUser = false; this.isUnfollow = true; this.isFollow = true;
+      } else {
+        console.log('No, this.otherID does not exist in localStorage.');
+        this.folUser = true; this.unfolUser = false; this.isFollow = true; this.isUnfollow = false;
+      }
+    } else {
+      console.log('No user IDs are stored in localStorage.');
+      this.folUser = true; this.unfolUser = false; this.isFollow = true; this.isUnfollow = false;
+    }
+
+  }
+  folUser: boolean = false;
   unfolUser: boolean = false;
   ID: string = ''
   userDetails: any[] = []
   isFollow: boolean = false;
   isUnfollow: boolean = false;
   followerID: string = '';
-  followUser(otherID: any) {
-    this.unfolUser = true;
-    this.folUser = false;
-    this.isFollow = true;
-    this.isUnfollow = true;
-    this.followerID = this.matchingUser.userID;
+  followedUserIDs: string[] = [];
 
+
+  followUser(otherID: any) {
+    this.isUnfollow = true; this.isFollow = false;
+    this.followerID = this.matchingUser.userID;
+    if (!this.followedUserIDs.includes(otherID)) {
+      this.followedUserIDs.push(otherID);
+      localStorage.setItem('followedUserIDs', JSON.stringify(this.followedUserIDs));
+      this.folUser = false;
+      this.unfolUser = true;
+    }
     const followData = {
       followeeID: otherID,
       followerID: this.followerID
-    }
+    };
     console.log(followData);
-    // this.userService.followUser(followData)
     this.userService.followUser(followData).subscribe(
       (response) => {
-        console.log('Followed successfully:', response);
         this.fetchAllUsers();
         this.fetchProfile();
+        this.unfolUser = true;
+        this.folUser = false;
+        this.isFollow = true;
+        this.isUnfollow = true;
+        console.log('Followed successfully:', response);
+
       },
       (error) => {
         console.error('Error following user:', error);
       }
     );
+
   }
 
+  unfollowUser(otherID: any) {
+    this.isUnfollow = false; this.isFollow = true;
+    this.followerID = this.matchingUser.userID;
 
-  unfollowUser() {
-    this.unfolUser = false;
+    const storedUserIDsString = localStorage.getItem('followedUserIDs');
+    if (storedUserIDsString) {
+      const storedUserIDs: string[] = JSON.parse(storedUserIDsString);
+      const index = storedUserIDs.indexOf(otherID);
+
+      if (index !== -1) {
+        storedUserIDs.splice(index, 1);
+
+        localStorage.setItem('followedUserIDs', JSON.stringify(storedUserIDs));
+      }
+    }
     this.folUser = true;
-    this.isFollow = false;
+    this.unfolUser = false;
+    const followData = {
+      followeeID: otherID,
+      followerID: this.followerID
+    };
+    console.log(followData);
+    this.userService.unfollowUser(followData).subscribe(
+      (response) => {
+        this.unfolUser = false;
+        this.folUser = true;
+        this.isFollow = true;
+        this.isUnfollow = false;
+        console.log('Unfollowed successfully:', response);
+        this.fetchAllUsers();
+        this.fetchProfile();
+      },
+      (error) => {
+        console.error('Error unfollowing user:', error);
+      }
+    );
+
   }
+
 
   personalContent: boolean = true;
   otherContent: boolean = false;
 
-
-
   //feeds functions
   //like
   postq: string = 'I remember sometimes back when road bikes were hard to purchase, I mean they used to cost a fortune. All I can you guys today are enjoying it. Anyway, enjoy your rides';
-  isFavorite = false;
-  favoriteCount = 0;
+  isFavorite: boolean = false;
+  postLikeStates: { [key: string]: boolean } = {};
+  likePost(postID: any, userName: any, userID: any) {
+    this.postLikeStates[postID] = !this.postLikeStates[postID];
+    const likeData: any = {
+      postID: postID,
+      userName: userName,
+      userID: userID
+    }
+    if (this.postLikeStates[postID]) {
+      console.log(likeData);
+      this.userService.likePost(likeData).subscribe(
+        (response) => {
+          console.log('Liked successfully:', response);
+          this.getAllPosts();
+        },
+        (error) => {
+          console.error('Error liking post:', error);
+        }
+      );
 
-  toggleFavorite() {
-    this.isFavorite = !this.isFavorite;
-    this.favoriteCount += this.isFavorite ? 1 : -1;
+    } else {
+      console.log(likeData);
+      this.userService.unlikePost(likeData).subscribe(
+        (response) => {
+          console.log('Unliked successfully:', response);
+          this.getAllPosts();
+        },
+        (error) => {
+          console.error('Error unliking post:', error);
+        }
+      );
+    }
+
   }
+
+
   //comment
   textPost2: string = '';
   postss1: boolean = false;
-  comment() {
+  commentData: any = {};
+  postContent: string = '';
+  postPic: string = '';
+  postUserName: string = '';
+  singlePostID: string = '';
+  postUserID: string = '';
+
+
+  commentPost(post: any) {
+    this.postContent = post.content;
+    this.postPic = post.postPic;
     this.modal = true;
     this.postss1 = true;
+    this.singlePostID = post.postID;
+    this.postUserName = post.userName;
+    this.postUserID = post.userID;
+    console.log(this.singlePostID);
+
+
   }
+
+  commentOnPost(userName: any, userID: any) {
+    this.modal = false;
+    this.postss1 = false;
+    this.commentData = {
+      postID: this.singlePostID,
+      userName: this.matchingUser.userName,
+      userID: this.matchingUser.userID,
+      content: this.textPost2
+    }
+
+    console.log(this.commentData);
+
+    this.userService.commentOnPost(this.commentData).subscribe(
+      (response) => {
+        console.log('Commented successfully:', response);
+        this.textPost2 = '';
+        this.getAllPosts();
+      },
+      (error) => {
+        console.error('Error commenting post:', error);
+      }
+    );
+
+
+  }
+
+  //view comment
+  commentFeeds: boolean = false;
+  viewPost(post: any) {
+    this.postContent = post.content;
+    this.postPic = post.postPic;
+    this.postUserName = post.userName;
+    this.singlePostID = post.postID;
+    this.feeds = false;
+    this.feeds1 = false;
+    this.commentOnCommentFeeds = false;
+    this.commentFeeds = true;
+    this.getPostComments();
+
+  }
+
+
+  //get post comments
+  postComments: any[] = [];
+  getPostComments() {
+    const postID = this.singlePostID;
+    console.log(postID);
+    this.userService.getCommentsOnPost(postID).subscribe(
+      (response) => {
+        console.log('Comments:', response);
+        this.postComments = response;
+      },
+      (error) => {
+        console.error('Error getting comments:', error);
+      }
+    );
+  }
+
+
+  //fetch comments of a post
+  comments: any[] = [];
+  commentPostID: string = '';
+  getCommentsOnPost(postID: any) {
+    this.commentPostID = postID;
+    console.log(postID);
+
+    // this.userService.getCommentsOnPost(postID).subscribe(
+    //   (response) => {
+    //     console.log('Comments:', response);
+    //     this.comments = response;
+    //   },
+    //   (error) => {
+    //     console.error('Error getting comments:', error);
+    //   }
+    // );
+  }
+
+  //comment on comment
+  cancel2(){
+    this.modal=false
+    this.commentOnComment = false
+
+  }
+  commentC: boolean = false;
+  commentOnComment: boolean = false;
+  CoCuserName: string = ''
+  CoCuserID: string = ''
+  isClickedId: string = ''
+  commentOnCommentData:any = {}
+  textPost3 :string = ''
+  commentComment(commentID: any, postID: any) {
+    this.modal = true
+    this.isClickedId = commentID
+    this.commentOnComment = true
+    this.CoCuserName = this.matchingUser.userName;
+    this.CoCuserID = this.matchingUser.userID
+    this.commentOnCommentData = {
+      userName: this.CoCuserName,
+      userID: this.CoCuserID,
+      commentID: commentID,
+      postID: postID,
+
+    }
+    console.log(this.commentOnCommentData);
+  }
+
+  postCommentOnComment(textPost3:any){
+    this.commentOnCommentData
+    console.log(textPost3);
+    const commentOnCommentData = {
+      userName: this.CoCuserName,
+      userID: this.CoCuserID,
+      parentCommentID: this.isClickedId,
+      postID: this.singlePostID,
+      content: textPost3
+    }
+    console.log(commentOnCommentData);
+    this.userService.commentOnComment(commentOnCommentData).subscribe(
+      (response) => {
+        console.log('Commented successfully:', response);
+        this.textPost3 = '';
+        this.getPostComments();
+        this.modal = false;
+        this.commentOnComment = false;
+      },
+      (error) => {
+        console.error('Error commenting post:', error);
+      }
+    );
+
+  }
+
+  //comment on comment
+  commentOnCommentFeeds: boolean = false;
+  commentContent:string = '';
+  singleCommentID:string = '';
+  commentUserName:string = '';
+
+  viewCommentsOnComment(comment:any){
+    this.feeds = false;
+    this.feeds1 = false;
+    this.commentFeeds = false;
+    this.commentOnCommentFeeds = true;
+    this.commentContent = comment.content;
+    this.commentUserName = comment.userName;
+    this.singleCommentID =comment.commentID;
+    this.getCommentsOnComment();
+
+  }
+  commentComments:any[]=[]
+  getCommentsOnComment(){
+    const commentID = this.singleCommentID;
+    console.log(commentID);
+    this.userService.getCommentsOnComment(commentID).subscribe(
+      (response) => {
+        console.log('Comments:', response);
+        this.commentComments = response;
+      },
+      (error) => {
+        console.error('Error getting comments:', error);
+      }
+    );
+
+  }
+
+
+  likeCommentComment(commentID: any) {
+    this.postLikeStates[commentID] = !this.postLikeStates[commentID];
+    console.log(commentID);
+    const likeData: any = {
+      commentID: commentID,
+      userID: this.matchingUser.userID
+    }
+    if (this.postLikeStates[commentID]) {
+      console.log(likeData);
+      this.userService.likeComment(likeData).subscribe(
+        (response) => {
+          console.log('Liked successfully:', response);
+          this.getPostComments();
+        },
+        (error) => {
+          console.error('Error liking post:', error);
+        }
+      );
+
+    } else {
+      console.log(likeData);
+      this.userService.unlikeComment(likeData).subscribe(
+        (response) => {
+          console.log('Unliked successfully:', response);
+          this.getPostComments();
+        },
+        (error) => {
+          console.error('Error unliking post:', error);
+        }
+      );
+    }
+  }
+
+  likeCommentComment2(commentID: any) {
+    this.postLikeStates[commentID] = !this.postLikeStates[commentID];
+    console.log(commentID);
+    const likeData: any = {
+      commentID: commentID,
+      userID: this.matchingUser.userID
+    }
+    if (this.postLikeStates[commentID]) {
+      console.log(likeData);
+      this.userService.likeComment(likeData).subscribe(
+        (response) => {
+          console.log('Liked successfully:', response);
+          this.getCommentsOnComment()
+        },
+        (error) => {
+          console.error('Error liking post:', error);
+        }
+      );
+
+    } else {
+      console.log(likeData);
+      this.userService.unlikeComment(likeData).subscribe(
+        (response) => {
+          console.log('Unliked successfully:', response);
+          this.getCommentsOnComment();
+        },
+        (error) => {
+          console.error('Error unliking post:', error);
+        }
+      );
+    }
+  }
+
 
   //feeds
   yourFollowers: boolean = false;
@@ -668,11 +997,15 @@ export class UserComponent {
   yourFollower() {
     this.feeds1 = false;
     this.feeds = true;
+    this.commentFeeds = false;
+    this.commentOnCommentFeeds = false;
 
   }
   yourFollowin() {
     this.feeds1 = true;
     this.feeds = false;
+    this.commentFeeds = false;
+    this.commentOnCommentFeeds = false;
 
   }
 

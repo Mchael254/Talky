@@ -8,20 +8,21 @@
       <div class="talkyPic">
 
       </div>
-
     </div>
 
     <div class="coonect">
       <div class="connect">
         <h1>Connect!</h1>
         <p> By Venum</p>
+      </div>
 
-      </div>
       <div class="enter">
-        <a routerLink="/signin">Signin</a>
-        <a routerLink="/signup">Signup</a>
+        <a routerLink="/signin" data-cy="signin">Signin</a>
+        <a routerLink="/signup" data-cy="signup">Signup</a>
       </div>
+
     </div>
+
     <div class="message">
       <div class="theMessage">
         <h1>Stories, feed, Corouse! <br>
@@ -29,6 +30,7 @@
       stories, moments and experiences</h1>
       </div>
     </div>
+
     <div class="globe">
       <div class="globeMessage">
         <h1>Share you experiences and moments with others across<br>the globe with talky</h1>
@@ -36,7 +38,6 @@
 
     </div>
     <!-- multiple testimony dynamicallly -->
-
     <div class="pictures" >
       <div *ngFor="let item of items; let i = index" class="profile" [ngClass]="{ 'slide-out': i === currentIndex }">
         <div class="pic">
@@ -47,7 +48,6 @@
         </div>
       </div>
     </div>
-
 
     <div class="footer">
       <div class="business">

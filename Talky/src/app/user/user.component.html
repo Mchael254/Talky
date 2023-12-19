@@ -16,13 +16,13 @@
     </div>
 
     <div class="parts">
-      <button (click)="exit()"><span style="border: solid 0px;" class="material-symbols-outlined">
+      <button (click)="exit()" data-cy="exit"><span style="border: solid 0px;" class="material-symbols-outlined">
           exit_to_app
         </span>Exit</button>
     </div>
 
     <div class="parts">
-      <button (clickOutside)="onClickedOutside($event)" (click)="mores()"><span style="border: solid 0px;"
+      <button (clickOutside)="onClickedOutside($event)" (click)="mores()" data-cy="more"><span style="border: solid 0px;"
           class="material-symbols-outlined">
           expand_circle_up
         </span>More</button>
@@ -35,14 +35,14 @@
           </span>Logout</button>
       </div>
       <div class="parts">
-        <button (click)="profileView()"><span style="border: solid 0px;" class="material-symbols-outlined">
+        <button (click)="profileView()"><span style="border: solid 0px;" class="material-symbols-outlined" data-cy="profile">
             account_circle
           </span>Profile</button>
       </div>
     </div>
 
     <div class="post">
-      <button (click)="POST()">Post</button>
+      <button (click)="POST()" data-cy="activatePost">Post</button>
     </div>
     <div *ngIf="modal" class="modal"></div>
     <div *ngIf="postss" class="postsD">
@@ -50,7 +50,7 @@
       <button (click)="cancel()" id="cancel">X</button>
       <div class="postContent">
         <img [src]="matchingUserDp" alt="userProfile">
-        <textarea type="text" [(ngModel)]="content" name="content" placeholder="Whats on your mind .."></textarea>
+        <textarea type="text" [(ngModel)]="content" name="content" placeholder="Whats on your mind .." data-cy="postContent"></textarea>
       </div>
       <div class="postMedia">
         <div class="galleryPost">
@@ -58,12 +58,13 @@
             <label class="material-symbols-outlined" for="fileInput">
               add_photo_alternate
             </label>
-            <input type="file" name="postPic" id="fileInput" (change)="previewImage($event)"  (change)="onSelected($event)">
+            <input type="file" name="postPic" id="fileInput" (change)="previewImage($event)"
+              (change)="onSelected($event)">
           </div>
         </div>
         <img class="" *ngIf="imagePreview" [src]="imagePreview" alt="Image Preview" id="imagePreview"
           (click)="closePreview()">
-        <button (click)="sharePost()">POST</button>
+        <button (click)="sharePost()" data-cy="sharePost">POST</button>
       </div>
     </div>
   </div>
@@ -75,8 +76,6 @@
     <div *ngIf="profile" class="profileManage">
       <div *ngIf="mine" class="profileBar">
         <div class="profilePhoto" (click)="openProfile()">
-          <!-- <img *ngIf="matchingUser && matchingUser.imagePath" [src]="getImageDataUrl(matchingUser)" -->
-          <!-- alt="Profile Picture"> -->
           <img [src]="matchingUserDp">
           <ng-template #defaultImage>
             <img [src]="'../../assets/talk.png'" alt="Default Image">
@@ -112,7 +111,7 @@
               <p>{{ matchingUserFollowCount}} Followers</p>
               <p>{{ matchingUserFollowingCount}} Following</p>
             </div>
-            <button *ngIf="edits" (click)="edit()">Edit Profile</button>
+            <button *ngIf="edits" (click)="edit()" data-cy="editProfile">Edit Profile</button>
           </div>
 
         </div>
@@ -121,7 +120,7 @@
       <!-- otherUser profile -->
       <div *ngIf="specificUser" class="profileBar">
         <div class="profilePhoto">
-          <!-- <img *ngIf="otherUser.profilePic" [src]="getImageDataUrl(otherUser)" alt="Profile Picture"> -->
+
           <img *ngIf="otherUser.imagePath; else defaultImage" [src]="otherUser.imagePath" alt="user image">
           <ng-template #defaultImage>
             <img [src]="'../../assets/talk.png'" alt="Default Image">
@@ -137,7 +136,7 @@
               <p><span style="font-weight: bold;"> {{otherFollowingCount}} </span>Following</p>
             </div>
             <button *ngIf="folUser" (click)="followUser(otherID)" [class.active]="isFollow">Follow</button>
-            <button *ngIf="unfolUser" (click)="unfollowUser()" [class.active]="isUnfollow">Unfollow</button>
+            <button *ngIf="unfolUser" (click)="unfollowUser(otherID)" [class.active]="isUnfollow">Unfollow</button>
           </div>
         </div>
       </div>
@@ -149,10 +148,10 @@
             <button (click)="getUserPosts()" [class.active]="linep">Post</button>
           </div>
           <div class="barParts">
-            <button (click)="getFollowers()" [class.active]="linefl">Followers</button>
+            <button (click)="getFollowers()" [class.active]="linefl" data-cy="followers">Followers</button>
           </div>
           <div class="barParts">
-            <button (click)="getFollowing()" [class.active]="lineFollowing">Following </button>
+            <button (click)="getFollowing()" [class.active]="lineFollowing" data-cy="following">Following </button>
           </div>
         </div>
 
@@ -172,14 +171,24 @@
             <p>Not following yet.</p>
           </div>
           <div *ngFor="let following of followings" class="follower">
-            <img [src]="following.imagePath" alt="">
+            <img *ngIf="following.imagePath; else defaultImage" [src]="following.imagePath" alt="">
+            <ng-template #defaultImage>
+              <img src="../../assets/talk.png" alt="Default Image">
+            </ng-template>
             <p style="font-weight: bold;">{{following.userName}}</p>
             <button>View</button>
           </div>
+
         </div>
 
         <div *ngIf="userPosts" class="postsC">
+
           <div *ngFor="let post of userPostss" class="feed">
+            <div *ngIf="changeModalUserPosts" class="pot">
+              <button (click)="confirmDelete()" data-cy="confirmDelete">delete</button>
+              <button (click)="CancelDelete()" data-cy="cancelDelete">Cancel</button>
+            </div>
+
             <div class="speak">
               <div class="speakImage">
                 <img [src]="matchingUserDp">
@@ -189,13 +198,13 @@
               </div>
               <div class="speakMessage">
                 <div class="speakDetails">
-                  <h3>{{post.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3>
+                  <h3>{{post.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span>
+                    <span><button (click)="deletePost(post.postID)" data-cy="deletePost">...</button></span>
+                  </h3>
                 </div>
                 <p style="color: rgb(82, 77, 77);">{{post.content}}</p>
                 <img *ngIf="post.postPic !== null" [src]="post.postPic" alt="">
               </div>
-
-
             </div>
           </div>
         </div>
@@ -231,7 +240,6 @@
           </div>
         </div>
 
-
         <div *ngIf="generalFollower" class="general">
           <div *ngIf="folowing" class="follower">
             <img src="{{image}}" alt="">
@@ -263,49 +271,37 @@
     <div *ngIf="feeds" class="feeds">
       <div class="foll">
         <button (click)="seeMore()" class="seeMore">Options</button>
-        <button (click)="yourFollower()">Following</button>
-        <button (click)="yourFollowin()">For you </button>
+        <button (click)="yourFollower()" data-cy="feeds">Following</button>
+        <button (click)="yourFollowin()" data-cy="recommended">For you </button>
       </div>
+
       <div *ngFor="let post of allPostss" class="feed">
-
-          <div class="speak">
-            <div class="speakImage">
-              <img [src]="matchingUserDp">
-              <ng-template #defaultImage>
-                <img [src]="'../../assets/talk.png'" alt="Default Image">
-              </ng-template>
+        <div class="speak" (click)="viewPost(post)" data-cy="viewPost">
+          <div class="speakImage">
+            <img [src]="post.imagePath">
+            <ng-template #defaultImage>
+              <img [src]="'../../assets/talk.png'" alt="Default Image">
+            </ng-template>
+          </div>
+          <div class="speakMessage">
+            <div class="speakDetails">
+              <h3>{{post.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3>
             </div>
-            <div class="speakMessage">
-              <div class="speakDetails">
-                <h3>{{post.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3>
-              </div>
-              <p style="color: rgb(82, 77, 77);">{{post.content}}</p>
-              <img *ngIf="post.postPic !== null" [src]="post.postPic" alt="">
-            </div>
-
-
+            <p style="color: rgb(82, 77, 77);">{{post.content}}</p>
+            <img *ngIf="post.postPic !== null" [src]="post.postPic" alt="">
           </div>
 
-        <!-- <div class="speak"> -->
-          <!-- <div class="speakImage"> -->
-            <!-- <!~~ <img *ngIf="user.profilePic" [src]="getImageDataUrl(user)" alt="Profile Picture"> ~~> -->
-          <!-- </div> -->
-          <!-- <div *ngFor="let post of allPostss" class="speakMessage"> -->
-            <!-- <div class="speakDetails"> -->
-              <!-- <!~~ <h3>{{user.userName}} <span style="font-size: 20px;color: #575555;">{{post.timeDifference}}</span></h3> ~~> -->
-            <!-- </div> -->
-            <!-- <p style="color: rgb(82, 77, 77);">{{post.content}}</p> -->
-            <!-- <img [src]="post.postPic" alt=""> -->
-          <!-- </div> -->
+        </div>
 
-        <!-- </div> -->
         <div class="impress">
-          <button (click)="toggleFavorite()" [class.active]="isFavorite">
-            <span class="material-symbols-outlined" [class.active]="isFavorite"
+          <button (click)="likePost(post.postID, post.userName, post.userID)"
+            [class.active]="postLikeStates[post.postID]" data-cy="likePost">
+            <span class="material-symbols-outlined" [class.active]="postLikeStates[post.postID]"
               style="border: solid 0px;font-weight: lighter;">favorite</span>
-            <span class="fav" style="font-size: medium;" [class.active]="isFavorite">{{ favoriteCount }}</span>
+            <span class="fav" style="font-size: medium;"
+              [class.active]="postLikeStates[post.postID]">{{post.likesCount}}</span>
           </button>
-          <button (click)="comment()"> <span class="material-symbols-outlined"
+          <button (click)="commentPost(post)" data-cy="activateCommentOnPost"> <span class="material-symbols-outlined"
               style="border: solid 0px;font-weight: lighter;">
               comment
             </span></button>
@@ -321,19 +317,130 @@
               <p style="font-weight: bold;">{{userName}}</p>
             </div>
             <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
-              <p>{{postq}}</p>
+              <p>{{postContent}}</p>
             </div>
 
             <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
               <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;">
               <textarea type="text" [(ngModel)]="textPost2" placeholder="Post your reply  .."
-                style="min-height: 6vh;border: solid blue 2px;"></textarea>
+                style="min-height: 6vh;border: solid blue 2px;" data-cy="commentOnPostContent"></textarea>
             </div>
-            <div class="postMedia" style="text-align: center;height: 7vh;width: 40vw;">
+            <div (click)="commentOnPost(post.userName,post.userID)" class="postMedia"
+              style="text-align: center;height: 7vh;width: 40vw;">
               <button style="background-color: #0094f5;color: #fff;text-align: center;width: 10vw;display: flex;align-items: center;
-              justify-content: center;margin-left: 35vw;margin-top: 25px;">REPLY</button>
+              justify-content: center;margin-left: 35vw;margin-top: 25px;" data-cy="commentOnPost">REPLY</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="commentFeeds" class="feeds">
+      <div class="foll">
+        <button (click)="yourFollower()">Following</button>
+        <button>For you </button>
+      </div>
+
+      <div class="commentFeed">
+        <div class="postContent" style="height: auto;min-height: 3vh;">
+          <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+          <p style="font-weight: bold;">{{postUserName}}</p>
+        </div>
+        <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
+          <p>{{postContent}}</p>
+          <img *ngIf="postPic !== null" [src]="postPic" alt="">
+        </div>
+
+        <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
+          <img src="{{matchingUserDp}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+          <textarea type="text" [(ngModel)]="textPost2" placeholder="Post your reply  .."
+            style="min-height: 6vh;border: solid #d9d9d9 2px;"></textarea>
+        </div>
+        <button class="commentButton"> POST</button>
+
+      </div>
+
+      <div *ngFor="let comment of postComments" class="comments">
+        <div class="postContent" style="height: auto;min-height: 3vh;">
+          <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+          <p style="font-weight: bold;">{{comment.userName}}</p>
+        </div>
+        <div (click)="viewCommentsOnComment(comment)" class="replic" data-cy="viewCommentsOnComment">
+          <p>{{comment.content}}</p>
+        </div>
+        <div class="impress">
+          <button (click)="commentComment(comment.commentID,comment.postID)"><span class="material-symbols-outlined"
+            >comment</span></button>
+          <button (click)="likeCommentComment(comment.commentID)"
+            [class.active]="postLikeStates[comment.commentID]">
+            <span class="material-symbols-outlined" [class.active]="postLikeStates[comment.postID]"
+              style="border: solid 0px;font-weight: lighter;">favorite</span>
+            <span class="fav" style="font-size: medium;"
+              [class.active]="postLikeStates[comment.commentID]">{{comment.likesCount}}</span>
+          </button>
+        </div>
+
+        <div *ngIf="comment.commentID == isClickedId ">
+          <div *ngIf="commentOnComment" class="postsD1" style="height: 60vh;width:40vw;padding: 20px;border-radius: 15px;">
+            <button (click)="cancel2()" id="cancel">X</button>
+
+            <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
+              <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+              <p style="font-weight: bold;">{{comment.userName}}</p>
+            </div>
+            <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
+              <p >{{comment.content}}</p>
+            </div>
+            <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
+              <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+              <p style="font-weight: bold;">{{userName}}</p>
+              <textarea type="text" [(ngModel)]="textPost3" placeholder="Post your reply  .."
+              style="min-height: 6vh;border: solid blue 2px;"></textarea>
+            </div>
+
+            <button (click)="postCommentOnComment(textPost3)" style=" background:linear-gradient(#0071a2,#04b3cb);color: #fff;text-align: center;width: 5vw;
+            display: flex;align-items: center;justify-content: center;margin-left: 30vw;margin-top: 25px;padding: 10px;
+            border-radius: 30px;cursor: pointer;"> REPLY</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="commentOnCommentFeeds" class="feeds">
+      <div class="foll">
+        <button (click)="yourFollower()">Following</button>
+        <button>For you </button>
+      </div>
+
+      <div class="commentFeed">
+        <div class="postContent" style="height: auto;min-height: 3vh;">
+          <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+          <p style="font-weight: bold;">{{commentUserName}}</p>
+        </div>
+        <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
+          <p>{{commentContent}}</p>
+        </div>
+      </div>
+
+      <div *ngFor="let CCmment of commentComments" class="comments">
+        <div class="postContent" style="height: auto;min-height: 3vh;">
+          <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
+          <p style="font-weight: bold;">{{CCmment.userName}}</p>
+        </div>
+        <div (click)="viewCommentsOnComment(CCmment)" class="replic">
+          <p>{{CCmment.content}}</p>
+        </div>
+        <div class="impress">
+          <button (click)="commentComment(CCmment.commentID,CCmment.postID)"><span class="material-symbols-outlined"
+            >comment</span></button>
+          <button (click)="likeCommentComment2(CCmment.commentID)"
+            [class.active]="postLikeStates[CCmment.commentID]">
+            <span class="material-symbols-outlined" [class.active]="postLikeStates[CCmment.postID]"
+              style="border: solid 0px;font-weight: lighter;">favorite</span>
+            <span class="fav" style="font-size: medium;"
+              [class.active]="postLikeStates[CCmment.commentID]">{{CCmment.likesCount}}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -359,16 +466,6 @@
 
         </div>
         <div class="impress">
-          <button (click)="toggleFavorite()" [class.active]="isFavorite">
-            <span class="material-symbols-outlined" [class.active]="isFavorite"
-              style="border: solid 0px;font-weight: lighter;">favorite</span>
-            <span class="fav" style="font-size: medium;" [class.active]="isFavorite">{{ favoriteCount }}</span>
-          </button>
-          <button (click)="comment()"> <span class="material-symbols-outlined"
-              style="border: solid 0px;font-weight: lighter;">
-              comment
-            </span></button>
-
           <div *ngIf="modal" class="modal"></div>
           <div *ngIf="postss1" class="postsD" style="height: 60vh;width:40vw;padding: 20px;border-radius: 15px;">
             <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent
@@ -459,6 +556,5 @@
       </div>
 
     </div>
-
 
   </div>

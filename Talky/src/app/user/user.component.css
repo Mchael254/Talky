@@ -130,6 +130,37 @@
 .postContent textarea:focus {
   outline: none;
 }
+.pot{
+  position: absolute;
+  background-color: #ffffff;
+  width: 10vw;
+  height: 12vh;
+  justify-content: space-around;
+  display: flex;
+  align-items: center;
+  top: 48vh;
+  right: 30vw;
+  flex-direction: column;
+  box-shadow: 5px 5px 3px 5px rgba(104, 103, 103, 0.2);
+}
+
+
+.pot button {
+  border: solid 0px;
+  padding: 10px 10px;
+  font-size: medium;
+  cursor: pointer;
+  font-size: 0.9vw;
+  height: 40px;
+  width: 100%;
+  color: black;
+  font-weight: bold;
+  background-color: #ffffff;
+}
+
+.pot button:hover {
+  background-color: #d9d9d9;
+}
 
 .postMedia {
   width: 42vw;
@@ -276,8 +307,6 @@ input[type="file"] {
 
 }
 
-
-
 .parts {
   width: 10vw;
   display: flex;
@@ -342,9 +371,9 @@ input[type="file"] {
 /* feeds */
 .feeds {
   width: 45vw;
-  min-height: 98vh;
+  max-height: 98vh;
   border: solid 1px #d9d9d9;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 
 }
@@ -433,6 +462,7 @@ input[type="file"] {
   width: 30vw;
   border: solid 2px #d9d9d9;
   margin-top: 10px;
+  cursor: pointer;
 
 }
 
@@ -448,6 +478,20 @@ input[type="file"] {
   margin-right: 5px;
   font-size: 30px;
   font-weight: bold;
+}
+.speakDetails button{
+  font-size: 25px;
+  border: solid 0px;
+  cursor: pointer;
+  padding-bottom: 10px;
+  margin-left: 33vw;
+
+}
+.speakDetails button:hover{
+  background-color:#95b9d1;
+  text-align: center;
+  border-radius: 50;
+
 }
 
 .speakContent {
@@ -507,13 +551,9 @@ input[type="file"] {
 }
 
 
-
-
-
-
 .profileManage {
   width: 45vw;
-  height: 957h;
+  height: 100vh;
   margin-top: -8px;
   border-top: solid 0px;
   display: flex;
@@ -899,6 +939,129 @@ input[type="file"] {
   font-weight: bold;
 }
 
+.commentFeed{
+  position: relative;
+  width: 44vw;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin: 10px 0px;
+  border-bottom: solid 2px #d9d9d9;
+}
+/* .commentButton{ */
+  /* position: absolute; */
+  /* right: 2vw; */
+  /* bottom: 10vh; */
+  /* border: solid 0px; */
+  /* border-radius: 30px; */
+  /* background:linear-gradient(#0071a2,#04b3cb); */
+  /* color: #ffffff; */
+  /* font-size: 25px; */
+  /* font-weight: bold; */
+  /* width: 5vw; */
+  /* height: 5vh; */
+  /* cursor: pointer; */
+  /* font-family: 'Comfortaa', sans-serif; */
+  /* font-family: 'Roboto', sans-serif; */
+  /* font-family: 'Shadows Into Light', cursive; */
+
+/* } */
+
+
+.comments{
+  width: 44vw;
+  min-height:10vh;
+  border-bottom: solid 2px #d9d9d9;
+  position: relative;
+}
+.comments .material-symbols-outlined{
+  font-size: 2.5rem;
+  color: #a19a9a;
+  cursor: pointer;
+  font-weight: 100;
+  transition: transform 0.5s ease-in-out;
+  border: solid 0px;
+}
+.comments button.active{
+  color: red;
+  transform: scale3d(1.2, 1.2, 1.2);
+}
+.impress button {
+  background-color: #ffffff;
+
+  display: flex;
+  align-items: center;
+}
+
+.impress button.active {
+  color: red;
+}
+
+
+.impress .material-symbols-outlined.active {
+  color: red;
+  transform: scale3d(1.2, 1.2, 1.2);
+
+}
+
+.impress .material-symbols-outlined:hover {
+  background-color: #ffffff;
+}
+
+.fav {
+  transition: transform 0.5s ease-in-out;
+
+}
+
+.fav.active {
+  animation: mymove 10s infinite;
+  transform: scale(1.5);
+}
+.commentButton{
+  position: absolute;
+  right: 2vw;
+  bottom: 10vh;
+  border: solid 0px;
+  border-radius: 30px;
+  background:linear-gradient(#0071a2,#04b3cb);
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: bold;
+  width: 5vw;
+  height: 5vh;
+  cursor: pointer;
+  font-family: 'Comfortaa', sans-serif;
+  font-family: 'Roboto', sans-serif;
+  font-family: 'Shadows Into Light', cursive;
+}
+.postsD1{
+  position: absolute;
+  top: 0vh;
+  left: 0;
+  position: absolute;
+  width: 50vw;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 5px;
+  z-index: 1000;
+  background-color: #fff;
+}
+.replic{
+  width: 43vw;
+  min-height: 3vh;
+  overflow-y:auto;
+  font-size: 25px;
+  cursor: pointer;
+}
+.replic:hover{
+  background-color: #d9d9d9;
+}
+
 /* media queries */
 
 
@@ -918,7 +1081,6 @@ input[type="file"] {
 
   .feeds {
     width: 100%;
-
     border: solid 2px #d9d9d9;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -936,6 +1098,7 @@ input[type="file"] {
   .speak {
     width: 90%;
     height: 90vh;
+    cursor:pointer;
 
   }
 
@@ -955,6 +1118,37 @@ input[type="file"] {
     border: solid 2px #d9d9d9;
     margin-top: 10px;
 
+  }
+  .simplePosts {
+    background-color: #d15959;
+    width: 10vw;
+    height: 15vh;
+    justify-content: space-around;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 15vh;
+    right: 40vw;
+    flex-direction: column;
+  }
+  .simplle{
+    border: solid red 2px;
+  }
+
+  .changeModalUserPosts button {
+    border: solid 0px;
+    padding: 10px 20px;
+    font-size: medium;
+    cursor: pointer;
+    font-size: 0.9vw;
+    height: 30px;
+    width: 100%;
+    color: black;
+    font-weight: bold;
+  }
+
+  .changeModalUserPosts button:hover {
+    background-color: #d9d9d9;
   }
 
   .speakDetails {
@@ -981,6 +1175,7 @@ input[type="file"] {
   }
 
 }
+
 
 @media screen and (max-width:720px) {
 

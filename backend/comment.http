@@ -10,12 +10,10 @@ Content-Type: application/json
 }
 
 ### get all comments on post
-get http://localhost:5800/comment/getPostComments
+get http://localhost:5800/comment/getPostComments/21d7f3cc-61dd-4842-ba42-d5f2a7e13154
 Content-Type: application/json
 
-{
-    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4"
-}
+
 
 ### comment on comment
 post http://localhost:5800/comment/commentOnComment
@@ -30,12 +28,9 @@ Content-Type: application/json
 }
 
 ### get all comments on comment
-get http://localhost:5800/comment/getCommentsOnComment
+get http://localhost:5800/comment/getCommentsOnComment/6282818c-4d6f-4d2a-a025-d56b6c13464d
 Content-Type: application/json
 
-{
-    "commentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963"
-}
 
 ### update comment
 put http://localhost:5800/comment/updateComment
@@ -52,6 +47,6 @@ delete http://localhost:5800/comment/deleteComment
 Content-Type: application/json
 
 {
-    "commentID": "ca0b9f66-cdc8-4cf0-9e2d-487941b72963",
-    "userID": "9595ba2e-b289-49c8-a0de-291aa56fb501"
+    "commentID": "34440171-368f-4a54-a336-d8828537090f",
+    "userID": "30b8726a-f623-4920-a0da-c77d183bbdca"
 }

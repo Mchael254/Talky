@@ -23,6 +23,8 @@ add likesCount int default 0
 -- where commentID = '79de179b-444f-4454-88ba-414bcb3cb264'
 
 -- SELECT * FROM Comments
+delete from Comments
+where userID = '30b8726a-f623-4920-a0da-c77d183bbdca'
 
 ALTER TABLE Comments
 DROP CONSTRAINT FK__Comments__postID__07C12930;

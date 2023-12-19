@@ -33,6 +33,12 @@ export const createPost = async (req: Request, res: Response) => {
         let postID = v4();
         const { userID, content, userName } = req.body;
         const pool = await mssql.connect(sqlConfig);
+
+        const userProfile = await pool.request()
+            .input('userID', mssql.VarChar, userID)
+            .query('SELECT imagePath FROM Users WHERE userID = @userID');
+        const imagePath = userProfile.recordset[0]?.imagePath;
+
         let insertQuery;
 
         if (req.file) {
@@ -41,15 +47,15 @@ export const createPost = async (req: Request, res: Response) => {
             console.log(postUrl);
 
             insertQuery = `
-                INSERT INTO Posts (postID, userID, postPic, content, userName)
-                VALUES (@postID, @userID, @postUrl, @content, @userName)
+                INSERT INTO Posts (postID, userID, postPic, content, userName, imagePath)
+                VALUES (@postID, @userID, @postUrl, @content, @userName,@imagePath)
             `;
         } else {
             console.log('No file uploaded');
 
             insertQuery = `
-                INSERT INTO Posts (postID, userID, content, userName)
-                VALUES (@postID, @userID, @content, @userName)
+                INSERT INTO Posts (postID, userID, content, userName,imagePath)
+                VALUES (@postID, @userID, @content, @userName,@imagePath)
             `;
         }
 
@@ -58,6 +64,7 @@ export const createPost = async (req: Request, res: Response) => {
         request.input('userID', mssql.VarChar, userID);
         request.input('content', mssql.VarChar, content);
         request.input('userName', mssql.VarChar, userName);
+        request.input('imagePath',mssql.VarChar,imagePath);
         if (postUrl) {
             request.input('postUrl', mssql.VarChar, postUrl);
         }
@@ -120,14 +127,12 @@ export const deletePost = async (req: Request, res: Response) => {
         const { postID } = req.body;
         const pool = await mssql.connect(sqlConfig);
 
-        // Check if the post exists before attempting deletion
         const checkResult = await pool
             .request()
             .input('postID', mssql.VarChar, postID)
             .query('SELECT 1 FROM Posts WHERE postID = @postID');
 
         if (checkResult.recordset.length > 0) {
-            // Post exists, proceed with deletion
             const result = await pool
                 .request()
                 .input('postID', mssql.VarChar, postID)
@@ -139,7 +144,6 @@ export const deletePost = async (req: Request, res: Response) => {
                 res.status(400).json({ message: 'Post deletion failed' });
             }
         } else {
-            // Post does not exist
             res.status(404).json({ message: 'The specified post does not exist' });
         }
 

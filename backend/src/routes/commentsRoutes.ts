@@ -5,9 +5,9 @@ import { commentOnComment, createComment, deleteComment, getCommentOnComment, ge
 const comment_router = Router()
 
 comment_router.post('/commentOnPost',createComment)
-comment_router.get('/getPostComments',getPostComments)
+comment_router.get('/getPostComments/:postID',getPostComments)
 comment_router.post('/commentOnComment',commentOnComment)
-comment_router.get('/getCommentsOnComment',getCommentOnComment)
+comment_router.get('/getCommentsOnComment/:commentID',getCommentOnComment)
 comment_router.put('/updateComment',updateComment)
 comment_router.delete('/deleteComment',deleteComment)
 

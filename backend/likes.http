@@ -22,9 +22,9 @@ post http://localhost:5800/likes/likePost
 Content-Type: application/json
 
 {
-    "postID": "cfbe1627-7ab1-46f7-a1d0-7817a42bd6d4",
-    "userID": "a5c1dee3-8c3a-4b80-abab-5389e8ad5455",
-    "userName": "dogo"
+    "postID": "21d7f3cc-61dd-4842-ba42-d5f2a7e13154",
+    "userID": "30b8726a-f623-4920-a0da-c77d183bbdca",
+    "userName": "only"
 }
 
 ### unlike post

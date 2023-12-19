@@ -41,7 +41,7 @@ export const createComment = async (req: express.Request, res: express.Response)
 //get post comments
 export const getPostComments = async (req: express.Request, res: express.Response) => {
     try {
-        const { postID } = req.body;
+        const { postID } = req.params;
         const pool = await mssql.connect(sqlConfig);
         const result = await pool
             .request()
@@ -90,7 +90,7 @@ export const commentOnComment = async (req: express.Request, res: express.Respon
 //get comment on comment
 export const getCommentOnComment = async (req: express.Request, res: express.Response) => {
     try {
-        const { commentID } = req.body;
+        const { commentID } = req.params;
         const pool = await mssql.connect(sqlConfig);
         const result = await pool
             .request()

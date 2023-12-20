@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { AdminService } from '../services/admin.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-password-reset',
@@ -18,81 +19,141 @@ export class PasswordResetComponent {
   line: boolean = false;
   message: boolean = false;
 
-  constructor(private http: HttpClient, private router: Router, private userAuth: AuthService, private adminService: AdminService) { }
-  // async onSubmit() {
-  //   this.line = true;
-  //   setTimeout(async () => {
-  //     this.line = false;
-  //   //credentials validation
-  //   if (!this.userName || !this.password) {
-  //     this.message = true;
-  //     this.loginError = 'Check your email for a link to reset your password. If it doesn’t appear within a few minutes, check your spam folder.';
-  //     this.clearRegisterError(4000);
-  //     return;
+  constructor(private http: HttpClient, private router: Router, private userAuth: AuthService, private adminService: AdminService, private userService: UserService) { }
 
-  //   }
-  //   const requestData = {
-  //     userName: this.userName,
-  //     password: this.password
-  //   };
-  //   this.loginError = '';
+  // reset password
+  email: string = '';
+  confirmPassword: string = '';
+  errorMessage: string = '';
+  successMessage: string = '';
+  newPassword: string = '';
 
-  //  await this.userAuth.login(requestData, () => {
-  //     this.userAuth.redirect();
+  container1: boolean = true;
+  container2: boolean = false;
 
-  //   });
-  //   this.loginError = this.userAuth.getLoginError();
-  //   this.loginSuccess = this.userAuth.getLoginSuccess();
+  resetError: boolean = false;
+  resetSuccess: boolean = false;
+  requestButton: boolean = true;
+  resetButton: boolean = false;
+  reset: boolean = false;
+  request: boolean = true;
+  token: string = '';
+  back: boolean = false;
 
-  //   this.clearRegisterError(4000);
-  // }, 3000);
-
-  // }
-
-  // clearRegisterError(delay: number) {
-  //   setTimeout(() => {
-  //     this.loginError = '';
-  //   }, delay);
-  // }
-  meso: string = '';
-  onImageSelected(event: any): void {
-    const fileList: FileList | null = event.target.files;
-    if (fileList && fileList.length > 0) {
-      this.selectedImage = fileList[0];
-    }
-  }
-
-  selectedImage: File | null = null;
-  userID: string = '';
-  onSubmit(): void {
-    if (!this.selectedImage) {
-      this.meso = 'Please select an image to upload';
+  requestResetPassword() {
+    if (this.email === '') {
+      this.resetError = true;
+      this.errorMessage = 'Please enter your email address';
+      setTimeout(() => {
+        this.resetError = false;
+        this.errorMessage = '';
+      }, 2500);
       return;
     }
-    if (!this.userID) {
-      this.meso = 'Please enter student name';
+
+    const emailFormatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailFormatRegex.test(this.email)) {
+      this.resetError = true;
+      this.errorMessage = 'Invalid email format';
+      setTimeout(() => {
+        this.resetError = false;
+        this.errorMessage = '';
+      }, 2500);
       return;
     }
-    console.log(this.selectedImage);
 
-    const formData = new FormData();
-    formData.append('profilePic', this.selectedImage);
-    formData.append('userID', this.userID);
-    console.log(formData);
-
-
-    this.adminService.uploadImage(formData).subscribe(
+    this.userService.initiatePasswordReset(this.email).subscribe(
       (response) => {
         console.log(response);
-        this.meso = response.message;
+        this.resetSuccess = true;
+        this.successMessage = response.message;
+        setTimeout(() => {
+          this.resetSuccess = false;
+          this.successMessage = '';
+          this.request = false;
+          this.reset = true;
+        }, 3000);
+        this.requestButton = false;
+        this.resetButton = true;
+        this.container1 = false;
+        this.container2 = true;
       },
       (error) => {
-        console.log(error);
-        this.meso = error.error.message;
+        console.error(error);
+        this.resetError = true;
+        this.errorMessage = error.error.message;
+        setTimeout(() => {
+          this.resetError = false;
+          this.errorMessage = '';
+        }, 2500);
       }
-    )
+    );
+  }
 
+ 
+  resetPassword() {
+
+    if (this.email === ''|| this.token === '' ) {
+      this.resetError = true;
+      this.errorMessage = 'Please fill all the fields';
+      setTimeout(() => {
+        this.resetError = false;
+        this.errorMessage = '';
+      }, 2500);
+      return;
+    }else if(this.newPassword.length < 8){
+      this.resetError = true;
+      this.errorMessage = 'Password must be at least 8 characters';
+      setTimeout(() => {
+        this.resetError = false;
+        this.errorMessage = '';
+      }, 2500);
+      return;
+    }
+
+    const emailFormatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailFormatRegex.test(this.email)) {
+      this.resetError = true;
+      this.errorMessage = 'Invalid email format';
+      setTimeout(() => {
+        this.resetError = false;
+        this.errorMessage = '';
+      }, 2500);
+      return;
+    }
+
+    this.userService.resetPassword(this.email, this.newPassword, this.token).subscribe(
+      (response) => {
+        console.log(response);
+        this.resetSuccess = true;
+        this.successMessage = response.message;
+        setTimeout(() => {
+          this.resetSuccess = false;
+          this.successMessage = '';
+          this.requestButton = false;
+          this.resetButton = false;
+          this.back = true;
+        }, 3000);
+        this.back = true;
+        this.reset = false;
+        this.requestButton = false;
+        console.log('Password reset successful:', response.message);
+        this.router.navigate(['/signin']);
+      },
+      (error) => {
+        console.error(error);
+        this.resetError = true;
+        this.errorMessage = error.error.message;
+        setTimeout(() => {
+          this.resetError = false;
+          this.errorMessage = '';
+        }, 2500);
+        console.error('Error during password reset:', error.error.message);
+      }
+    );
 
   }
+
+
 
 }

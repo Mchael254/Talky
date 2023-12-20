@@ -378,6 +378,13 @@
             <span class="fav" style="font-size: medium;"
               [class.active]="postLikeStates[comment.commentID]">{{comment.likesCount}}</span>
           </button>
+          <!-- <button style="font-size: 30px;cursor: pointer;"  (click)="popEditComment(comment.commentID, comment.userID)">...</button> -->
+        </div>
+        <div *ngIf="comment.commentID == iisClickedId"  [class.highlightedEditPanel]="comment.commentID == isClickedId" 
+        class="editPanel">
+          <input type="text" placeholder="edit comment" [(ngModel)]="updateContent" > <span><button (click)="editCooment()">Edit</button></span>
+          <button (click)="closeUpdate()">close</button>
+
         </div>
 
         <div *ngIf="comment.commentID == isClickedId ">
@@ -518,12 +525,7 @@
           </div>
 
           <div class="input-container">
-            <input type="password" placeholder="password" [(ngModel)]="password" name="passwords" data-cy="password">
-          </div>
-
-          <div class="input-container">
-            <input type="password" placeholder="confirm password" [(ngModel)]="confirm_password" name="confirm_password"
-              data-cy="confirm-password">
+            <input type="password" placeholder="insert password to change" [(ngModel)]="password" name="passwords" data-cy="password">
           </div>
           <button type="submit" data-cy="signup-btn" value="Submit">Change Profile</button>
         </form>

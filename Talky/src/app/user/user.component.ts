@@ -6,6 +6,7 @@ import { filter } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
 import { AdminService } from '../services/admin.service';
+import { is } from 'cypress/types/bluebird';
 
 @Component({
   selector: 'app-user',
@@ -14,11 +15,17 @@ import { AdminService } from '../services/admin.service';
 })
 export class UserComponent {
   constructor(private userService: UserService, private router: Router, private adminService: AdminService) { }
+
   ngOnInit() {
     this.fetchAllUsers();
     this.fetchProfile();
     this.getAllPosts();
+    this.updateDp();
 
+  }
+
+  reloadPage() {
+    window.location.reload()
   }
 
   //profile management
@@ -28,7 +35,6 @@ export class UserComponent {
   email: string = '';
   userName: string = '';
   password: string = '';
-  confirm_password: string = '';
   profil: boolean = false;
   updateError: string = '';
   updateSuccess: string = '';
@@ -72,7 +78,7 @@ export class UserComponent {
   err: boolean = false;
 
   onSubmit() {
-    if (this.userName === '' || this.email === '' || this.password === '' || this.confirm_password === '') {
+    if (this.userName === '' || this.email === '' || this.password === '') {
       this.err = true;
       this.updateError = 'All fields are required';
       setTimeout(() => {
@@ -83,7 +89,7 @@ export class UserComponent {
       return;
     }
     const isPasswordValid = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(this.password);
-    if (this.password !== this.confirm_password || this.password.length < 8 || !isPasswordValid) {
+    if (this.password.length < 8 || !isPasswordValid) {
       this.err = true;
       this.updateError = 'Weak password use at least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character';
       setTimeout(() => {
@@ -118,7 +124,6 @@ export class UserComponent {
           this.updateSuccess = ''
           this.success = false;
           this.password = '';
-          this.confirm_password = '';
         }, 2500);
       },
       (error) => {
@@ -500,6 +505,7 @@ export class UserComponent {
   }
 
   userEmails: any;
+  meso: string = '';
   updateDp() {
     this.userEmails = localStorage.getItem('user_email');
     const email = this.userEmails
@@ -511,16 +517,17 @@ export class UserComponent {
     }
     console.log(this.selectedImage);
     const formData = new FormData();
-    formData.append('profilePic', this.selectedImage);
+    formData.append('imagePath', this.selectedImage);
     formData.append('email', this.email);
     console.log(formData);
-    this.adminService.uploadImage(formData).subscribe(
+    this.userService.uploadProfilePic(formData).subscribe(
       (response) => {
+        this.profileView();
         this.modalProfileUpdate = false;
-        this.compareAndRetrieveDetails();
         console.log(response);
         this.changeModal = false;
-        // this.meso = response.message;
+        this.meso = response.message;
+
       },
       (error) => {
         console.log(error);
@@ -781,6 +788,38 @@ export class UserComponent {
 
   }
 
+  //update comment
+  updateCommentPop: boolean = false;
+  updateCommentData: any = {};
+  updateCommentID: string = '';
+  updateCommentContent: string = '';
+  updateCommentUserID: string = '';
+  popUpdateComment(comment: any) {
+    this.updateCommentPop = true;
+    this.updateCommentID = comment.commentID;
+    this.updateCommentContent = comment.content;
+    this.updateCommentUserID = comment.userID;
+    this.updateCommentData = {
+      commentID: this.updateCommentID,
+      updateContent: this.updateCommentContent,
+      userID: this.updateCommentUserID
+    }
+    console.log(this.updateCommentData);
+    // this.userService.updateComment(this.updateCommentData).subscribe(
+    //   (response) => {
+    //     console.log('Comment updated successfully:', response);
+    //     this.getPostComments();
+    //   },
+    //   (error) => {
+    //     console.error('Error updating comment:', error);
+    //   }
+    // );
+  }
+  updateComment() {
+
+  }
+ 
+
   //view comment
   commentFeeds: boolean = false;
   viewPost(post: any) {
@@ -833,8 +872,8 @@ export class UserComponent {
   }
 
   //comment on comment
-  cancel2(){
-    this.modal=false
+  cancel2() {
+    this.modal = false
     this.commentOnComment = false
 
   }
@@ -843,8 +882,8 @@ export class UserComponent {
   CoCuserName: string = ''
   CoCuserID: string = ''
   isClickedId: string = ''
-  commentOnCommentData:any = {}
-  textPost3 :string = ''
+  commentOnCommentData: any = {}
+  textPost3: string = ''
   commentComment(commentID: any, postID: any) {
     this.modal = true
     this.isClickedId = commentID
@@ -861,7 +900,7 @@ export class UserComponent {
     console.log(this.commentOnCommentData);
   }
 
-  postCommentOnComment(textPost3:any){
+  postCommentOnComment(textPost3: any) {
     this.commentOnCommentData
     console.log(textPost3);
     const commentOnCommentData = {
@@ -887,25 +926,65 @@ export class UserComponent {
 
   }
 
+  //edit comment
+
+  iisClickedId: string | null = null;
+  updateContent: string = '';
+  updateCommentData2: any = {};
+
+  popEditComment(commentID: string,userID:string) {
+    this.iisClickedId = commentID;
+    this.updateCommentData2 = {
+      commentID: commentID,
+      updateContent: this.updateContent,
+      userID: userID
+
+    }
+    console.log(this.updateCommentData2);
+   
+    
+  }
+  closeUpdate(){
+    this.iisClickedId = null;
+  }
+
+  editCooment(){
+  
+    this.updateCommentData2
+    console.log(this.updateCommentData2);
+    this.userService.updateComment(this.updateCommentData2).subscribe(
+      (response) => {
+        console.log('Comment updated successfully:', response);
+        this.getPostComments();
+        // this.iisClickedId = null;
+      },
+      (error) => {
+        console.error('Error updating comment:', error);
+      }
+    );
+
+  }
+
+
   //comment on comment
   commentOnCommentFeeds: boolean = false;
-  commentContent:string = '';
-  singleCommentID:string = '';
-  commentUserName:string = '';
+  commentContent: string = '';
+  singleCommentID: string = '';
+  commentUserName: string = '';
 
-  viewCommentsOnComment(comment:any){
+  viewCommentsOnComment(comment: any) {
     this.feeds = false;
     this.feeds1 = false;
     this.commentFeeds = false;
     this.commentOnCommentFeeds = true;
     this.commentContent = comment.content;
     this.commentUserName = comment.userName;
-    this.singleCommentID =comment.commentID;
+    this.singleCommentID = comment.commentID;
     this.getCommentsOnComment();
 
   }
-  commentComments:any[]=[]
-  getCommentsOnComment(){
+  commentComments: any[] = []
+  getCommentsOnComment() {
     const commentID = this.singleCommentID;
     console.log(commentID);
     this.userService.getCommentsOnComment(commentID).subscribe(

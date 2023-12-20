@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class UserService {
 
   private apiUrl = 'http://localhost:5800/user';
-  private photoUrl = 'http://localhost:5800/user/uploadProfilePic';
+  private photoUrl = 'http://localhost:5800/user/picUpload';
   private postsUrl = 'http://localhost:5800/post';
   private followUrl = 'http://localhost:5800/follow';
   private createPostUrl = 'http://localhost:5800/post/createPost';
@@ -118,6 +118,31 @@ export class UserService {
   unlikeComment(likeData: any): Observable<any> {
     return this.http.post(`${this.likePostUrl}/unlikeComment`, likeData);
   }
+
+  //update comment
+  updateComment(updateData:any): Observable<any> {
+
+    return this.http.put(`${this.commentUrl}/updateComment`, updateData);
+  }
+
+  //request reset password
+  private requestResetPasswordUrl = 'http://localhost:5800/user/requestPasswordReset';
+
+  initiatePasswordReset(email: string): Observable<any> {
+    const requestBody = { email };
+
+    return this.http.post<any>(this.requestResetPasswordUrl, requestBody);
+  }
+
+  //reset password
+  private resetPasswordUrl = 'http://localhost:5800/user';
+
+  resetPassword(email: string, newPassword: string, token: string): Observable<any> {
+    const resetData = { email, newPassword, token };
+    return this.http.post(`${this.resetPasswordUrl}/resetPassword`, resetData);
+  }
+
+
 
 
 

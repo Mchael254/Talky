@@ -5,6 +5,57 @@
   justify-content: space-around;
 
 }
+.editPanel{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40vw;
+  height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  background-color: #0071a2;
+  border-radius: 15px;
+ 
+}
+.editPanel input{
+  width: 30vw;
+  height: 10vh;
+  border-radius: 15px;
+  border: solid 0px;
+  background-color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 10px;
+  font-family: 'Comfortaa', sans-serif;
+  font-family: 'Roboto', sans-serif;
+  font-family: 'Shadows Into Light', cursive;
+  text-align: center;
+}
+.editPanel button{
+  width: 5vw;
+  height: 5vh;
+  border-radius: 15px;
+  border: solid 0px;
+  background-color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 10px;
+  font-family: 'Comfortaa', sans-serif;
+  font-family: 'Roboto', sans-serif;
+  font-family: 'Shadows Into Light', cursive;
+  text-align: center;
+  cursor: pointer;
+}
+.highlightedEditPanel {
+  background-color: #f0f0f0; /* Light grey background */
+  border: 1px solid #007bff; /* Blue border */
+  padding: 10px;
+  box-shadow: 0px 0px 10px #007bff; /* Shadow for emphasis */
+  transition: all 0.3s ease-in-out; /* Smooth transition for pop effect */
+}
+
 
 .navigation {
   height: 67vh;

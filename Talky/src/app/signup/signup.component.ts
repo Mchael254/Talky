@@ -36,7 +36,7 @@ export class SignupComponent {
   //magic
   sign: boolean = true;
   magics: boolean = false;
-  talky: boolean = false;
+  talky: boolean = true;
   line: boolean = false;
 
 

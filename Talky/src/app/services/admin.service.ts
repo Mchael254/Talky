@@ -7,12 +7,12 @@ import { Observable } from 'rxjs';
 })
 export class AdminService {
 
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient) { }
   // private picUrl = 'http://localhost:5800/user/uploadProfilePic';
   private picUrl1 = 'http://localhost:5800/user/picUpload';
 
-  uploadImage(formData:FormData): Observable<any>{
-    return this.http.post(this.picUrl1,formData)
+  uploadImage(formData: FormData): Observable<any> {
+    return this.http.post(this.picUrl1, formData)
 
   }
 
@@ -20,10 +20,6 @@ export class AdminService {
   //   return this.http.post(this.picUrl,formData)
 
   // }
-
-
-
-
 
 
 

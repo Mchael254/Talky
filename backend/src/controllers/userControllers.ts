@@ -48,7 +48,6 @@ export const upload = multer({
 }).single('imagePath');
 
 
-
 //upload profile pic
 export const uploadProfilePic1 = async (req: Request, res: Response) => {
     try {

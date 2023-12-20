@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: talkydb
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: Michael123.100#
+      MSSQL_PID: Developer
+    env_file:
+      - /.env
+    ports:
+      - '1433:1433'
+    volumes:
+      - talkydbdata:/var/opt/mssql
+  
+  backend:
+    depends_on:
+      - database
+    build: ./
+    container_name: talkybackend
+    restart: always
+    env_file:
+      - /.env
+    ports:
+      - '4400:4400'
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+
+volumes:
+  talkydbdata:

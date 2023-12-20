@@ -7,6 +7,8 @@ use Talky
 --     FOREIGN KEY (followerID) REFERENCES Users(userID),
 --     FOREIGN KEY (followeeID) REFERENCES Users(userID)
 -- );
+alter table Follows
+add followStatus int not null default 0
 
 select * from Follows
 select *from Users

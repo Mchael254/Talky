@@ -28,7 +28,7 @@ ALTER TABLE Users
 ADD followingCount INT DEFAULT 0;
 
 delete from Users
-where email = 'mike@yopmail.com'
+where email = 'gamemy177@gmail.com'
 
 alter table Users 
 add imagePath varchar(855) null

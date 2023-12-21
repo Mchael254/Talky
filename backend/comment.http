@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ### get all comments on post
-get http://localhost:5800/comment/getPostComments/21d7f3cc-61dd-4842-ba42-d5f2a7e13154
+get http://localhost:5800/comment/getPostComments/11c2089d-50e9-4ebc-be77-a6aba4776a9a
 Content-Type: application/json
 
 

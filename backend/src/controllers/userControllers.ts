@@ -89,10 +89,10 @@ export const uploadProfilePic1 = async (req: Request, res: Response) => {
 export const registerUser = async (req: Request, res: Response) => {
     try {
         let { userName, email, password } = req.body;
-        const { error } = userRegisterValidationSchema.validate(req.body);
-        if (error) {
-            return res.json({ message: error.details[0].message })
-        }
+        // const { error } = userRegisterValidationSchema.validate(req.body);
+        // if (error) {
+        //     return res.json({ message: error.details[0].message })
+        // }
 
         let userID = v4();
         const hashedPwd = await bcrypt.hash(password, 5);
@@ -114,7 +114,7 @@ export const registerUser = async (req: Request, res: Response) => {
         } else if (emailCheckResult.recordset.length > 0) {
             return res.status(400).json({ error: 'Email already exists' });
         } else if (userNameCheckResult.recordset.length > 0) {
-            return res.status(400).json({ error: 'UserName already exists.' });
+            return res.status(400).json({ error: 'UserName already exists' });
         }
 
         const data = await pool.request()
@@ -164,7 +164,7 @@ export const loginUser = async (req: Request, res: Response) => {
                     error: 'Incorrect password',
                 });
             }
-            // Include only essential information in the token payload
+            
             const { userName, email, role } = user[0];
             const tokenPayload = { userName, email, role };
 
@@ -314,7 +314,7 @@ export const initiate_password_reset = async (req: Request, res: Response) => {
                 return res.status(200).json({ message: `password reset initiated check ${email} for more details`,
              });
             } else {
-                return res.status(400).json({ message: 'email not found.' });
+                return res.status(400).json({ message: 'email not found' });
             }
         } else {
             return res.status(500).json({

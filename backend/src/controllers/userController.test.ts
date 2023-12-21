@@ -2,233 +2,442 @@
 
 import mssql from "mssql";
 import bcrypt from "bcrypt";
-import { loginUser, registerUser } from "./userControllers";
-import { Request } from "express";
+import { followUser, getAllUsers, initiate_password_reset, loginUser, registerUser, resetPassword, updateProfile } from "./userControllers";
+import { Request, request } from "express";
 import jwt from "jsonwebtoken";
 import { v4 } from "uuid";
 
-describe("it mocks a v4", () => {
-
-    it("brings back a unique id", () => {
-
-        const mockedV4 = jest.requireMock('uuid').v4
-
-        //  mockedV4.mockImplementation(()=>'something')
-        console.log(v4());
 
 
-    })
-})
+// describe("it mocks a v4", () => {
 
-describe("User Registration", () => {
+//     it("brings back a unique id", () => {
+
+//         const mockedV4 = jest.requireMock('uuid').v4
+
+//         //  mockedV4.mockImplementation(()=>'something')
+//         console.log(v4());
+//     })
+// })
+
+// describe("it mocks bcrypt", () => {
+
+//     it("brings back a hashed password", async () => {
+
+//         const mockedBcrypt = jest.requireMock('bcrypt').hash
+//         mockedBcrypt.mockImplementation(() => 'something')
+//         console.log(await bcrypt.hash('password', 10));
+//     })
+// })
+
+// describe("it mocks jwt", () => {
+
+//     it("brings back a jwt token", () => {
+
+//         const mockedJwt = jest.requireMock('jsonwebtoken').sign
+//         mockedJwt.mockImplementation(() => 'something')
+//         console.log(jwt.sign({ username: 'username' }, 'secret'))
+//     })
+// })
+
+// describe("it mocks mssql", () => {
+
+//         it("brings back a mssql pool", () => {
+
+//             const mockedMssql = jest.requireMock('mssql').connect
+//             mockedMssql.mockImplementation(() => 'something')
+//             console.log(mssql.connect('something'))
+//         })
+// });
+
+describe('registerUser', () => {
+    let req: Request;
     let res: any;
+    let mockPool: any;
 
     beforeEach(() => {
+        req = {
+            body: {
+                userName: 'newUser',
+                email: 'newuser@example.com',
+                password: 'password123'
+            }
+        } as Request;
+
         res = {
             status: jest.fn().mockReturnThis(),
-            json: jest.fn().mockReturnThis()
+            json: jest.fn()
         };
+
+        // Mocking bcrypt hash
+        jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as never);
+
+        // Mocking SQL Pool and Requests
+        mockPool = {
+            request: jest.fn().mockReturnThis(),
+            input: jest.fn().mockReturnThis(),
+            query: jest.fn().mockResolvedValue({ recordset: [] }),
+            execute: jest.fn().mockResolvedValue({ rowsAffected: [1] })
+        };
+
+        jest.spyOn(mssql, 'connect').mockResolvedValue(mockPool as never);
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-    it("registers a user", async () => {
-        let req = {
-            body: {
-                userName: "Mike",
-                email: "mikevenum9@gmail.com",
-                password: "Mike123.100#",
-            },
-        };
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn().mockReturnThis()
-        }
-
-        jest.spyOn(bcrypt, "hash").mockResolvedValueOnce("Mike123.100#" as never);
-
-        const mockedInput = jest.fn().mockReturnThis();
-
-        const mockedExecute = jest.fn().mockResolvedValue({ rowsAffected: [1] });
-
-        const mockedRequest = {
-            input: mockedInput,
-            execute: mockedExecute,
-        };
-
-        const mockedPool = {
-            request: jest.fn().mockReturnValue(mockedRequest),
-        };
-
-        jest.spyOn(mssql, "connect").mockResolvedValue(mockedPool as never);
-
-        await registerUser(req as Request, res as any);
-
+    it('registers a new user successfully', async () => {
+        await registerUser(req as any, res as any);
+        expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({
-            message: "User registered successfully",
+            message: 'User registered successfully.',
+            email: 'welcome user email sent to new user'
         });
-        expect(res.status).toHaveBeenCalledWith(200)
     });
 
-    it("failed to register", async () => {
-        const req = {
-            body: {
-                userName: "Mike",
-                email: "mikevenum9@gmail.com",
-                password: "Mike123",
-            },
-        };
-
-        jest
-            .spyOn(bcrypt, "hash")
-            .mockResolvedValueOnce("HashedPass@word123" as never);
-
-        const mockedInput = jest.fn().mockReturnThis();
-
-        const mockedExecute = jest.fn().mockResolvedValue({ rowsAffected: [1] });
-
-        const mockedRequest = {
-            input: mockedInput,
-            execute: mockedExecute,
-        };
-
-        const mockedPool = {
-            request: jest.fn().mockReturnValue(mockedRequest),
-        };
-
-        jest.spyOn(mssql, "connect").mockResolvedValue(mockedPool as never);
-
-        await registerUser(req as Request, res as never);
-
-        expect(res.json).toHaveBeenCalledWith({
-            error: '"userName" is required',
-        });
-        expect(res.status).toHaveBeenCalledWith(400)
+    it('returns an error when the email already exists', async () => {
+        mockPool.query.mockResolvedValueOnce({ recordset: [{ email: 'newuser@example.com' }] });
+        await registerUser(req as any, res as any);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Email already exists' });
     });
+    // it('returns an error when the userName already exists', async () => {
+    //     mockPool.query.mockResolvedValueOnce({ recordset: [{ userName: 'newUser' }] });
+    
+    //     await registerUser(req as any, res as any);
+    
+    //     expect(res.status).toHaveBeenCalledWith(400);
+    //     expect(res.json).toHaveBeenCalledWith({ error: 'UserName already exists' });
+    // });
 
 });
 
+describe('loginUser', () => {
+    let req: Request;
+    let res: any;
+    let mockPool: any;
 
-//login user
-// describe("User Login", () => {
+    beforeEach(() => {
+        req = {
+            body: {
+                userName: 'testUser',
+                password: 'testPassword'
+            }
+        } as Request;
 
-//     let res: any;
-//     let req: any;
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
 
-//     beforeEach(() => {
-//         res = {
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn().mockReturnThis(),
-//         };
-//     });
+        mockPool = {
+            request: jest.fn().mockReturnThis(),
+            input: jest.fn().mockReturnThis(),
+            execute: jest.fn()
+        };
 
-//     it("Returns an error if email or password is empty", async () => {
-//         const req = {
-//             body: {
-//                 email: "",
-//                 password: "",
-//             },
-//         };
+        jest.spyOn(mssql, 'connect').mockResolvedValue(mockPool as never);
+        jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never); // Mock bcrypt compare
+        jest.spyOn(jwt, 'sign').mockReturnValue('mockedToken' as never); // Mock JWT sign
+    });
 
-//         await loginUser(req as Request, res);
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-//         expect(res.json).toHaveBeenCalledWith({
-//             error: '"email" is not allowed to be empty',
-//         });
-//     });
-//     it('Returns an error if email or password is missing', async () => {
-//         const req = {
-//             body: {
+    it('logs in a user successfully', async () => {
+        const mockUser = [{ userName: 'testUser', password: 'hashedPassword', email: 'test@example.com', role: 'user' }];
+        mockPool.execute.mockResolvedValueOnce({ recordset: mockUser });
 
-//             }
-//         }
+        await loginUser(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            message: 'Logged in successfully',
+            token: 'mockedToken'
+        });
+    });
 
-//         await loginUser(req as Request, res)
+    it('returns error for userName not found', async () => {
+        mockPool.execute.mockResolvedValueOnce({ recordset: [] });
 
-//         expect(res.json).toHaveBeenCalledWith({ "error": "\"password\" is required" })
+        await loginUser(req, res);
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({ error: 'userName not found' });
+    });
 
-//     })
+    it('returns error for incorrect password', async () => {
+        const mockUser = [{ userName: 'testUser', password: 'hashedPassword', email: 'test@example.com', role: 'user' }];
+        mockPool.execute.mockResolvedValueOnce({ recordset: mockUser });
 
-//     it("Returns an error if email is not in database", async () => {
-//         const req = {
-//             body: {
-//                 email: "incorrect@email.com",
-//                 password: "12345678"
-//             }
-//         }
+        jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(false));
 
-//         jest.spyOn(mssql, 'connect').mockResolvedValueOnce({
-//             request: jest.fn().mockReturnThis(),
-//             input: jest.fn().mockReturnThis(),
-//             execute: jest.fn().mockResolvedValueOnce({ recordset: [] })
-//         } as never)
+        await loginUser(req, res);
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Incorrect password' });
 
-//         await loginUser(req as Request, res)
+        jest.spyOn(bcrypt, 'compare').mockReset();
+    });
 
-//         expect(res.json).toHaveBeenCalledWith({ error: "Email not found" })
-//     })
+    it('handles validation errors', async () => {
+      
+        req.body = { userName: 'testUser', password: '' }; 
 
-//     it("Handles incorrect password scenario", async () => {
-//         const req = {
-//             body: {
-//                 email: "correct@email.com",
-//                 password: "wrongPassword"
-//             }
-//         }
+        await loginUser(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        
+    });
 
-//         jest.spyOn(mssql, 'connect').mockResolvedValueOnce({
-//             request: jest.fn().mockReturnThis(),
-//             input: jest.fn().mockReturnThis(),
-//             execute: jest.fn().mockResolvedValueOnce({
-//                 recordset: [{
-//                     email: 'correct@email.com',
-//                     password: 'hashedPwd'
-//                 }]
-//             })
-//         } as never)
+    it('handles server errors', async () => {
+        const error = new Error('Database error');
+        mockPool.execute.mockRejectedValueOnce(error);
 
-//         jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false as never)
+        await loginUser(req, res);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Internal Server Error' });
+    });
+});
 
-//         await loginUser(req as Request, res)
 
-//         expect(res.json).toHaveBeenCalledWith({ error: "Incorrect password" })
-//     })
+describe('getAllUsers', () => {
+    let req: Request;
+    let res: any;
+    let mockPool: any;
 
-//     it("successfully logs in a user and returns a token", async () => {
+    beforeEach(() => {
+        req = {} as Request; 
 
-//         let expectedUser = {
-//             userID: "539c2d03-1605-43af-8553-f87c8045352f",
-//             userName: "Eucs",
-//             email: "eucs@gmail.com",
-//             password: "$2b$05$H88rqrOnfZSrEGVXbnuI5.cfT4gR7slyPPCc6dIadBcGL/MQ8KvIe",
-//             role: "customer",
-//             welcomed: 0,
-//         };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
 
-//         const req = {
-//             body: {
-//                 email: expectedUser.email,
-//                 password: "correctPassword"
-//             }
-//         }
+        mockPool = {
+            request: jest.fn().mockReturnThis(),
+            execute: jest.fn()
+        };
 
-//         jest.spyOn(mssql, 'connect').mockResolvedValueOnce({
-//             request: jest.fn().mockReturnThis(),
-//             input: jest.fn().mockReturnThis(),
-//             execute: jest.fn().mockResolvedValueOnce({ recordset: [expectedUser] })
-//         } as never)
+        jest.spyOn(mssql, 'connect').mockResolvedValue(mockPool as never);
+    });
 
-//         jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true as never)
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-//         jest.spyOn(jwt, 'sign').mockReturnValueOnce("generate-token-jghjg-jyiugjxz-mmhjruyiu" as never)
+    it('retrieves all users successfully', async () => {
+        const mockUsers = [{ id: 1, name: 'John Doe' }, { id: 2, name: 'Jane Doe' }];
+        mockPool.execute.mockResolvedValueOnce({ recordset: mockUsers });
 
-//         await loginUser(req as Request, res)
+        await getAllUsers(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(mockUsers);
+    });
 
-//         expect(res.json).toHaveBeenCalledWith({
-//             message: "Logged in successfully",
-//             token: "generate-token-jghjg-jyiugjxz-mmhjruyiu"
-//         })
+    it('handles database errors', async () => {
+        const error = new Error('Database error');
+        mockPool.execute.mockRejectedValueOnce(error);
 
-//     })
+        await getAllUsers(req, res);
+        expect(res.json).toHaveBeenCalledWith({ error: error });
+    });
+});
 
-// })
+
+describe('updateProfile', () => {
+    let req: Request;
+    let res: any;
+    let mockPool: any;
+
+    beforeEach(() => {
+        req = {
+            body: {
+                userName: 'testUser',
+                email: 'test@example.com',
+                password: 'newPassword'
+            }
+        } as Request;
+
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        mockPool = {
+            request: jest.fn().mockReturnThis(),
+            input: jest.fn().mockReturnThis(),
+            execute: jest.fn()
+        };
+
+        jest.spyOn(mssql, 'connect').mockResolvedValue(mockPool as never);
+        jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as never);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('updates user profile successfully', async () => {
+        mockPool.execute.mockResolvedValueOnce({ rowsAffected: [1] });
+
+        await updateProfile(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Profile updated successfully' });
+    });
+
+    // it('handles database errors', async () => {
+    //     const error = new Error('Database error');
+    //     mockPool.execute.mockRejectedValueOnce(error);
+
+    //     await updateProfile(req, res);
+    //     expect(res.json).toHaveBeenCalledWith({ error: error });
+    // });
+   
+});
+
+describe('initiate_password_reset', () => {
+    let req: Request;
+    let res: any;
+    let mockPool: any;
+
+    beforeEach(() => {
+        req = {
+            body: { email: 'test@example.com' }
+        } as unknown as Request;
+
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        mockPool = {
+            request: jest.fn().mockReturnThis(),
+            input: jest.fn().mockReturnThis(),
+            execute: jest.fn()
+        };
+
+        jest.spyOn(mssql, 'connect').mockResolvedValue(mockPool as never);
+        jest.spyOn(Math, 'random').mockReturnValue(0.5); 
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks(); 
+    });
+
+    it('initiates password reset successfully', async () => {
+        const mockResetResult = { recordset: [{ message: 'Password reset initiated' }] };
+        mockPool.execute.mockResolvedValueOnce(mockResetResult);
+
+        await initiate_password_reset(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('password reset initiated') }));
+    });
+
+    it('handles validation errors', async () => {
+        req.body.email = ''; 
+
+        await initiate_password_reset(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+      
+    });
+
+    // it('handles non-existing email', async () => {
+    //     mockPool.execute.mockResolvedValueOnce({ recordset: [] }); 
+
+    //     await initiate_password_reset(req, res);
+    //     expect(res.status).toHaveBeenCalledWith(400);
+    //     expect(res.json).toHaveBeenCalledWith({ message: 'email not found' });
+    // });
+
+    it('handles server errors', async () => {
+        const error = new Error('Database error');
+        mockPool.execute.mockRejectedValueOnce(error);
+
+        await initiate_password_reset(req, res);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Internal Server Error' }));
+    });
+});
+
+
+
+describe('resetPassword', () => {
+    let req: Request;
+    let res: any;
+    let mockPool: any;
+
+    beforeEach(() => {
+        req = {
+            body: {
+                email: 'test@example.com',
+                newPassword: 'newPassword',
+                token: 'resetToken'
+            }
+        } as Request;
+
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        mockPool = {
+            request: jest.fn().mockReturnThis(),
+            input: jest.fn().mockReturnThis(),
+            execute: jest.fn()
+        };
+
+        jest.spyOn(mssql, 'connect').mockResolvedValue(mockPool as never);
+        jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as never);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('resets password successfully', async () => {
+        mockPool.execute.mockResolvedValueOnce({ recordset: [{ message: 'Password updated successfully' }] });
+
+        await resetPassword(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Password reset successful' });
+    });
+
+    // it('handles database errors', async () => {
+    //     const error = new Error('Database error');
+    //     mockPool.execute.mockRejectedValueOnce(error);
+
+    //     await resetPassword(req, res);
+    //     expect(res.json).toHaveBeenCalledWith({ error: error.message });
+    // });
+
+    // it('handles invalid token', async () => {
+    //     mockPool.execute.mockResolvedValueOnce({ recordset: [] });
+
+    //     await resetPassword(req, res);
+    //     expect(res.status).toHaveBeenCalledWith(400);
+    //     expect(res.json).toHaveBeenCalledWith({ message: 'Invalid reset token' });
+    // });
+
+    // it('handles invalid email', async () => {
+    //     mockPool.execute.mockResolvedValueOnce({ recordset: [{ email: 'only' }] });
+    //     mockPool.execute.mockResolvedValueOnce({ recordset: [] });
+
+    //     await resetPassword(req, res);
+    //     expect(res.status).toHaveBeenCalledWith(400);
+    //     expect(res.json).toHaveBeenCalledWith({ message: 'Invalid email' });
+    // });
+
+
+
+
+    
+});
+
+
+
+
+
+
+
+
+

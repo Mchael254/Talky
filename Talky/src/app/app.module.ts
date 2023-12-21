@@ -14,6 +14,7 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ClickOutsideModule } from 'ng-click-outside';
+import { RestPasswordComponent } from './rest-password/rest-password.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { ClickOutsideModule } from 'ng-click-outside';
     UserComponent,
     PasswordResetComponent,
     PagenotfoundComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    RestPasswordComponent
   ],
   imports: [
     BrowserModule,

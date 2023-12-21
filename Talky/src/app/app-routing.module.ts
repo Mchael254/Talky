@@ -8,6 +8,7 @@ import { PasswordResetComponent } from './password-reset/password-reset.componen
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { UserComponent } from './user/user.component';
+import { RestPasswordComponent } from './rest-password/rest-password.component';
 
 const routes: Routes = [
   {path:'',redirectTo:'/landing',pathMatch:'full'},
@@ -17,7 +18,7 @@ const routes: Routes = [
   {path:'user',component:UserComponent},
   {path:'passwordReset',component:PasswordResetComponent},
   {path:'admin',component:AdminComponent},
-  {path:'welcome',component:WelcomeComponent},
+  {path:'reset',component:RestPasswordComponent},
   {path:'**',component:PagenotfoundComponent}
 ];
 

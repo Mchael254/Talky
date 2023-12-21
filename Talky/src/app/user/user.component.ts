@@ -262,7 +262,6 @@ export class UserComponent {
 
   //profile
   profileView() {
-    // this.moreModal = false;
     this.getUserPosts();
     this.more = false;
     this.profile = true;
@@ -818,7 +817,7 @@ export class UserComponent {
   updateComment() {
 
   }
- 
+
 
   //view comment
   commentFeeds: boolean = false;
@@ -941,15 +940,15 @@ export class UserComponent {
 
     }
     console.log(this.updateCommentData2);
-   
-    
+
+
   }
   closeUpdate(){
     this.iisClickedId = null;
   }
 
   editCooment(){
-  
+
     this.updateCommentData2
     console.log(this.updateCommentData2);
     this.userService.updateComment(this.updateCommentData2).subscribe(

@@ -5,7 +5,7 @@
     </div>
 
     <div class="parts">
-      <button (click)="viewHome()"><span style="border: solid 0px;" class="material-symbols-outlined">
+      <button (click)="viewHome()"><span style="border: solid 0px;" class="material-symbols-outlined" data-cy="home">
           home
         </span>Home</button>
     </div>
@@ -30,7 +30,7 @@
 
     <div *ngIf="moret" class="more">
       <div class="parts">
-        <button (click)="logout()"><span style="border: solid 0px;" class="material-symbols-outlined">
+        <button (click)="logout()" data-cy="logout"><span style="border: solid 0px;" class="material-symbols-outlined">
             logout
           </span>Logout</button>
       </div>
@@ -73,7 +73,7 @@
   <div class="functions">
     <!-- user and other's profiles -->
     <!-- userProfile -->
-    <div *ngIf="profile" class="profileManage">
+    <div *ngIf="profile" class="profileManage" data-cy="profileManage">
       <div *ngIf="mine" class="profileBar">
         <div class="profilePhoto" (click)="openProfile()">
           <img [src]="matchingUserDp">
@@ -135,8 +135,8 @@
               <p><span style="font-weight: bold;"> {{otherFollowCount}}</span>Followers </p>
               <p><span style="font-weight: bold;"> {{otherFollowingCount}} </span>Following</p>
             </div>
-            <button *ngIf="folUser" (click)="followUser(otherID)" [class.active]="isFollow">Follow</button>
-            <button *ngIf="unfolUser" (click)="unfollowUser(otherID)" [class.active]="isUnfollow">Unfollow</button>
+            <button *ngIf="folUser" (click)="followUser(otherID)" [class.active]="isFollow" data-cy="follow">Follow</button>
+            <button *ngIf="unfolUser" (click)="unfollowUser(otherID)" [class.active]="isUnfollow" data-cy="unfollow">Unfollow</button>
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@
       <div *ngIf="personalContent" class="content">
         <div class="bar">
           <div class="barParts">
-            <button (click)="getUserPosts()" [class.active]="linep">Post</button>
+            <button (click)="getUserPosts()" [class.active]="linep" data-cy="myPost">Post</button>
           </div>
           <div class="barParts">
             <button (click)="getFollowers()" [class.active]="linefl" data-cy="followers">Followers</button>
@@ -268,7 +268,7 @@
     </div>
 
     <!-- default feeds -->
-    <div *ngIf="feeds" class="feeds">
+    <div *ngIf="feeds" class="feeds" data-cy="feeds">
       <div class="foll">
         <button (click)="seeMore()" class="seeMore">Options</button>
         <button (click)="yourFollower()" data-cy="feeds">Following</button>
@@ -295,9 +295,9 @@
 
         <div class="impress">
           <button (click)="likePost(post.postID, post.userName, post.userID)"
-            [class.active]="postLikeStates[post.postID]" data-cy="likePost">
+            [class.active]="postLikeStates[post.postID]" id="likePost" data-cy="likePosts">
             <span class="material-symbols-outlined" [class.active]="postLikeStates[post.postID]"
-              style="border: solid 0px;font-weight: lighter;">favorite</span>
+              style="border: solid 0px;font-weight: lighter;" >favorite</span>
             <span class="fav" style="font-size: medium;"
               [class.active]="postLikeStates[post.postID]">{{post.likesCount}}</span>
           </button>
@@ -311,12 +311,12 @@
             <p *ngIf="sentSuccess" style="background-color:#0094f5; padding: 10px;color:antiquewhite">Sent
               successfully
             </p>
-            <button (click)="cancel()" id="cancel">X</button>
+            <button (click)="cancel()" id="cancel" data-cy="cancel">X</button>
             <div class="postContent" style="height: auto;min-height: 3vh;">
               <img src="{{image}}" alt="" style="height: 6vh;width: 3vw;">
               <p style="font-weight: bold;">{{userName}}</p>
             </div>
-            <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;">
+            <div class="reply" style="width: 30vw;min-height: 3vh;overflow-y:auto;font-size: 25px;" data-cy="postContent">
               <p>{{postContent}}</p>
             </div>
 
@@ -354,7 +354,7 @@
         <div class="postContent" style="height:auto; display: flex;align-items: flex-start;">
           <img src="{{matchingUserDp}}" alt="" style="height: 6vh;width: 3vw;border-radius: 50%;">
           <textarea type="text" [(ngModel)]="textPost2" placeholder="Post your reply  .."
-            style="min-height: 6vh;border: solid #d9d9d9 2px;"></textarea>
+            style="min-height: 6vh;border: solid #d9d9d9 2px;" data-cy="textPost"></textarea>
         </div>
         <button class="commentButton"> POST</button>
 
@@ -380,7 +380,7 @@
           </button>
           <!-- <button style="font-size: 30px;cursor: pointer;"  (click)="popEditComment(comment.commentID, comment.userID)">...</button> -->
         </div>
-        <div *ngIf="comment.commentID == iisClickedId"  [class.highlightedEditPanel]="comment.commentID == isClickedId" 
+        <div *ngIf="comment.commentID == iisClickedId"  [class.highlightedEditPanel]="comment.commentID == isClickedId"
         class="editPanel">
           <input type="text" placeholder="edit comment" [(ngModel)]="updateContent" > <span><button (click)="editCooment()">Edit</button></span>
           <button (click)="closeUpdate()">close</button>
@@ -539,8 +539,8 @@
           <span class="material-symbols-outlined" style="border: solid 0px;">
             search
           </span>
-          <input type="text" placeholder="Search" [(ngModel)]="searchTearm" (input)="filterUsers()">
-          <div *ngIf="filteredUsers.length === 0" class="no-results-message">Not found</div>
+          <input type="text" placeholder="Search" [(ngModel)]="searchTearm" (input)="filterUsers()" data-cy="searchs">
+          <div *ngIf="filteredUsers.length === 0" class="no-results-message" >Not found</div>
         </div>
 
       </div>
@@ -553,7 +553,7 @@
           </ng-template>
           <p style="font-weight: bold;">{{user.userName}}</p>
           <p style="display: none;">{{user.userID}}</p>
-          <button (click)="viewSpecificUser(user)">View</button>
+          <button (click)="viewSpecificUser(user)" data-cy="viewUser">View</button>
         </div>
       </div>
 
